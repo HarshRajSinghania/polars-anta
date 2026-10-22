@@ -4,7 +4,22 @@ from __future__ import annotations
 
 import polars as pl
 
-from polars_ta.volume import adl, cmf, eom, mfi, obv, vwap, vwma
+from polars_ta.volume import (
+    adl,
+    cmf,
+    eom,
+    force_index,
+    klinger,
+    mfi,
+    nvi,
+    obv,
+    pvi,
+    pvt,
+    vpci,
+    vr,
+    vwap,
+    vwma,
+)
 
 
 def test_obv(sample_ohlcv_df: pl.DataFrame):
@@ -70,3 +85,53 @@ def test_eom(sample_ohlcv_df: pl.DataFrame):
     result = sample_ohlcv_df.select(eom("high", "low", "volume", period=10).alias("eom"))
     vals = [x for x in result["eom"].to_list() if x is not None]
     assert len(vals) > 0
+
+
+def test_klinger(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        klinger(
+            "high", "low", "close", "volume", fast_period=5, slow_period=10, signal_period=3
+        ).alias("kvo")
+    ).unnest("kvo")
+    assert "klinger" in result.columns
+    assert "signal" in result.columns
+
+
+def test_nvi(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(nvi("close", "volume").alias("nvi"))
+    vals = [x for x in result["nvi"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_pvi(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(pvi("close", "volume").alias("pvi"))
+    vals = [x for x in result["pvi"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_pvt(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(pvt("close", "volume").alias("pvt"))
+    vals = [x for x in result["pvt"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_force_index(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(force_index("close", "volume", period=5).alias("fi"))
+    vals = [x for x in result["fi"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_vpci(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        vpci("close", "volume", period_short=3, period_long=6).alias("vpci")
+    )
+    vals = [x for x in result["vpci"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_vr(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(vr("close", "volume", period=10).alias("vr"))
+    vals = [x for x in result["vr"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0

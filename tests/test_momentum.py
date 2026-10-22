@@ -7,13 +7,23 @@ import pytest
 
 from polars_ta.momentum import (
     awesome_oscillator,
+    bop,
     cci,
+    cfo,
+    cmo,
+    coppock,
+    dpo,
+    fisher_transform,
+    kst,
     macd,
+    ppo,
     roc,
     rsi,
+    rvi,
     stoch_rsi,
     stochastic,
     tsi,
+    ultimate_oscillator,
     williams_r,
 )
 
@@ -135,3 +145,82 @@ def test_tsi(sample_ohlcv_df: pl.DataFrame):
     assert len(vals) > 0
     for v in vals:
         assert -100.0 <= v <= 100.0
+
+
+def test_cmo(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(cmo("close", period=10).alias("cmo"))
+    vals = [x for x in result["cmo"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert -100.0 <= v <= 100.0
+
+
+def test_ppo(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        ppo("close", fast_period=5, slow_period=10).alias("ppo")
+    ).unnest("ppo")
+    assert "ppo" in result.columns
+    assert "signal" in result.columns
+    assert "histogram" in result.columns
+
+
+def test_coppock(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        coppock("close", wma_period=5, fast_roc=3, slow_roc=6).alias("coppock")
+    )
+    vals = [x for x in result["coppock"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_ultimate_oscillator(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        ultimate_oscillator("high", "low", "close", 3, 5, 8).alias("uo")
+    )
+    vals = [x for x in result["uo"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert 0.0 <= v <= 100.0
+
+
+def test_fisher_transform(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(fisher_transform("high", "low", period=5).alias("ft")).unnest(
+        "ft"
+    )
+    assert "fisher" in result.columns
+    assert "signal" in result.columns
+
+
+def test_rvi(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        rvi("open", "high", "low", "close", period=5).alias("rvi")
+    ).unnest("rvi")
+    assert "rvi" in result.columns
+    assert "signal" in result.columns
+
+
+def test_kst(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        kst("close", r1=3, r2=4, r3=5, r4=6, s1=3, s2=3, s3=3, s4=4).alias("kst")
+    ).unnest("kst")
+    assert "kst" in result.columns
+    assert "signal" in result.columns
+
+
+def test_dpo(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(dpo("close", period=10).alias("dpo"))
+    vals = [x for x in result["dpo"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_bop(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(bop("open", "high", "low", "close").alias("bop"))
+    vals = [x for x in result["bop"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert -1.0 <= v <= 1.0
+
+
+def test_cfo(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(cfo("close", period=5).alias("cfo"))
+    vals = [x for x in result["cfo"].to_list() if x is not None]
+    assert len(vals) > 0

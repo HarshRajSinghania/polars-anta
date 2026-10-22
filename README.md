@@ -101,9 +101,9 @@ universe.with_columns(
 
 ---
 
-## Supported Indicators (32 Indicators)
+## Supported Indicators (66 Indicators)
 
-### Trend
+### Trend (19 Indicators)
 - **`sma(close, period=10)`**: Simple Moving Average
 - **`ema(close, period=10)`**: Exponential Moving Average
 - **`wma(close, period=10)`**: Linearly-Weighted Moving Average
@@ -113,10 +113,20 @@ universe.with_columns(
 - **`zlema(close, period=10)`**: Zero-Lag Exponential Moving Average
 - **`vortex(high, low, close, period=14)`**: Vortex Indicator (`vi_plus`, `vi_minus`)
 - **`adx(high, low, close, period=14)`**: Average Directional Index (`adx`, `plus_di`, `minus_di`)
+- **`aroon(high, low, period=25)`**: Aroon Oscillator & Indicator (`up`, `down`, `oscillator`)
+- **`chop(high, low, close, period=14)`**: Choppiness Index (Trend vs Consolidation)
+- **`t3(close, period=5, vfactor=0.7)`**: Tillson T3 Moving Average
+- **`alma(close, period=9, offset=0.85, sigma=6.0)`**: Arnaud Legoux Moving Average (Gaussian-filtered)
+- **`mass_index(high, low, fast_period=9, slow_period=25)`**: Mass Index (Reversal predictor)
+- **`supertrend(high, low, close, period=10, multiplier=3.0)`**: SuperTrend Volatility Stop (`supertrend`, `direction`)
+- **`psar(high, low, af_step=0.02, af_max=0.2)`**: Parabolic Stop and Reverse (Trailing SAR)
+- **`kama(close, period=10, fast_span=2, slow_span=30)`**: Kaufman's Adaptive Moving Average
+- **`mcginley_dynamic(close, period=14, k=0.6)`**: McGinley Dynamic Average
+- **`vidya(close, period=9, cmo_period=9)`**: Variable Index Dynamic Average (Chande's VIDYA)
 
-### Momentum
+### Momentum (19 Indicators)
 - **`rsi(close, period=14)`**: Relative Strength Index (Wilder's smoothing)
-- **`macd(close, fast=12, slow=26, signal=9)`**: Moving Average Convergence Divergence
+- **`macd(close, fast=12, slow=26, signal=9)`**: Moving Average Convergence Divergence (`macd`, `signal`, `histogram`)
 - **`stochastic(high, low, close, k=14, d=3)`**: Stochastic Oscillator (%K, %D)
 - **`williams_r(high, low, close, period=14)`**: Williams %R
 - **`cci(high, low, close, period=20)`**: Commodity Channel Index
@@ -124,8 +134,18 @@ universe.with_columns(
 - **`stoch_rsi(close, rsi_period=14, stoch_period=14)`**: Stochastic RSI (%K, %D)
 - **`awesome_oscillator(high, low, fast=5, slow=34)`**: Awesome Oscillator (AO)
 - **`tsi(close, long_period=25, short_period=13)`**: True Strength Index (TSI)
+- **`cmo(close, period=14)`**: Chande Momentum Oscillator
+- **`ppo(close, fast=12, slow=26, signal=9)`**: Percentage Price Oscillator (`ppo`, `signal`, `histogram`)
+- **`coppock(close, wma_period=10, fast_roc=11, slow_roc=14)`**: Coppock Curve
+- **`ultimate_oscillator(high, low, close, p1=7, p2=14, p3=28)`**: Ultimate Oscillator (UO)
+- **`fisher_transform(high, low, period=10)`**: Ehlers Fisher Transform (`fisher`, `signal`)
+- **`rvi(open, high, low, close, period=10)`**: Relative Vigor Index (`rvi`, `signal`)
+- **`kst(close)`**: "Know Sure Thing" Oscillator (`kst`, `signal`)
+- **`dpo(close, period=20)`**: Detrended Price Oscillator
+- **`bop(open, high, low, close)`**: Balance of Market Power
+- **`cfo(close, period=14)`**: Chande Forecast Oscillator
 
-### Volatility
+### Volatility (14 Indicators)
 - **`true_range(high, low, close)`**: True Range
 - **`atr(high, low, close, period=14)`**: Average True Range
 - **`bollinger_bands(close, period=20, num_std=2.0)`**: Bollinger Bands (Upper, Middle, Lower, Bandwidth, %B)
@@ -133,8 +153,15 @@ universe.with_columns(
 - **`donchian_channels(high, low, period=20)`**: Donchian Channels (Upper, Middle, Lower)
 - **`stddev(close, period=20)`**: Rolling Standard Deviation
 - **`ulcer_index(close, period=14)`**: Ulcer Index (Downside Drawdown Risk)
+- **`chandelier_exit(high, low, close, period=22, multiplier=3.0)`**: Chandelier Exit (`long_stop`, `short_stop`)
+- **`natr(high, low, close, period=14)`**: Normalized Average True Range (%)
+- **`historical_volatility(close, period=20, trading_days=252)`**: Annualized Log Historical Volatility
+- **`parkinson_volatility(high, low, period=20, trading_days=252)`**: Parkinson Extreme-Value Volatility
+- **`garman_klass_volatility(open, high, low, close, period=20, trading_days=252)`**: Garman-Klass Efficient Volatility
+- **`chaikin_volatility(high, low, period=10, roc_period=10)`**: Chaikin Volatility
+- **`donchian_width(high, low, period=20)`**: Donchian Channel Width (%)
 
-### Volume
+### Volume (14 Indicators)
 - **`obv(close, volume)`**: On-Balance Volume
 - **`vwap(high, low, close, volume, period=None)`**: Volume Weighted Average Price (Cumulative or Rolling)
 - **`vwma(close, volume, period=20)`**: Volume Weighted Moving Average
@@ -142,6 +169,13 @@ universe.with_columns(
 - **`adl(high, low, close, volume)`**: Accumulation/Distribution Line
 - **`mfi(high, low, close, volume, period=14)`**: Money Flow Index
 - **`eom(high, low, volume, period=14)`**: Ease of Movement (EMV)
+- **`klinger(high, low, close, volume, fast=34, slow=55, signal=13)`**: Klinger Volume Oscillator (`klinger`, `signal`)
+- **`nvi(close, volume)`**: Negative Volume Index
+- **`pvi(close, volume)`**: Positive Volume Index
+- **`pvt(close, volume)`**: Price Volume Trend
+- **`force_index(close, volume, period=13)`**: Elder's Force Index
+- **`vpci(close, volume, short_period=5, long_period=20)`**: Volume Price Confirmation Indicator
+- **`vr(close, volume, period=26)`**: Volume Ratio (Bullish vs Bearish volume)
 
 ---
 

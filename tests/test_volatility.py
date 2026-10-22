@@ -7,8 +7,15 @@ import polars as pl
 from polars_ta.volatility import (
     atr,
     bollinger_bands,
+    chaikin_volatility,
+    chandelier_exit,
     donchian_channels,
+    donchian_width,
+    garman_klass_volatility,
+    historical_volatility,
     keltner_channels,
+    natr,
+    parkinson_volatility,
     stddev,
     true_range,
     ulcer_index,
@@ -90,6 +97,64 @@ def test_stddev(sample_ohlcv_df: pl.DataFrame):
 def test_ulcer_index(sample_ohlcv_df: pl.DataFrame):
     result = sample_ohlcv_df.select(ulcer_index("close", period=10).alias("ui"))
     vals = [x for x in result["ui"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_chandelier_exit(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        chandelier_exit("high", "low", "close", period=10).alias("ce")
+    ).unnest("ce")
+    assert "long_stop" in result.columns
+    assert "short_stop" in result.columns
+
+
+def test_natr(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(natr("high", "low", "close", period=10).alias("natr"))
+    vals = [x for x in result["natr"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_historical_volatility(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(historical_volatility("close", period=10).alias("hv"))
+    vals = [x for x in result["hv"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_parkinson_volatility(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(parkinson_volatility("high", "low", period=10).alias("pv"))
+    vals = [x for x in result["pv"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_garman_klass_volatility(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        garman_klass_volatility("open", "high", "low", "close", period=10).alias("gk")
+    )
+    vals = [x for x in result["gk"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_chaikin_volatility(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        chaikin_volatility("high", "low", period=5, roc_period=5).alias("cv")
+    )
+    vals = [x for x in result["cv"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_donchian_width(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(donchian_width("high", "low", period=10).alias("dw"))
+    vals = [x for x in result["dw"].to_list() if x is not None]
     assert len(vals) > 0
     for v in vals:
         assert v >= 0.0

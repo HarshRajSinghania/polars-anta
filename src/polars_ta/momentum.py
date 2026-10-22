@@ -5,6 +5,7 @@ from __future__ import annotations
 import polars as pl
 
 from .core import IntoExpr, parse_expr, wilder_smooth
+from .trend import ema, wma
 
 
 def rsi(close: IntoExpr, period: int = 14) -> pl.Expr:
@@ -299,3 +300,353 @@ def tsi(
     abs_smooth_2 = abs_smooth_1.ewm_mean(span=short_period, adjust=False)
 
     return pl.when(abs_smooth_2 > 0.0).then(100.0 * smooth_2 / abs_smooth_2).otherwise(0.0)
+
+
+def cmo(close: IntoExpr, period: int = 14) -> pl.Expr:
+    """Chande Momentum Oscillator (CMO).
+
+    Oscillates between -100 and +100 based on price momentum.
+
+    :param close: price column or expression
+    :param period: lookback period (default 14)
+    :return: Polars expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    c = parse_expr(close)
+    diff = c.diff(1)
+    gain = pl.when(diff > 0.0).then(diff).otherwise(0.0)
+    loss = pl.when(diff < 0.0).then(-diff).otherwise(0.0)
+
+    sum_gain = gain.rolling_sum(window_size=period)
+    sum_loss = loss.rolling_sum(window_size=period)
+    total = sum_gain + sum_loss
+
+    return pl.when(total > 0.0).then(100.0 * (sum_gain - sum_loss) / total).otherwise(0.0)
+
+
+def ppo(
+    close: IntoExpr,
+    fast_period: int = 12,
+    slow_period: int = 26,
+    signal_period: int = 9,
+) -> pl.Expr:
+    """Percentage Price Oscillator (PPO).
+
+    Returns a struct with fields:
+        - 'ppo': Percentage Price Oscillator line
+        - 'signal': EMA of PPO line
+        - 'histogram': PPO line minus signal line
+
+    :param close: price column or expression
+    :param fast_period: fast EMA period (default 12)
+    :param slow_period: slow EMA period (default 26)
+    :param signal_period: signal line EMA period (default 9)
+    :return: Polars Struct expression
+    """
+    if fast_period <= 0 or slow_period <= 0 or signal_period <= 0:
+        raise ValueError("periods must be positive integers greater than zero")
+    if fast_period >= slow_period:
+        raise ValueError("fast_period must be less than slow_period")
+
+    c = parse_expr(close)
+    fast_ema = ema(c, period=fast_period)
+    slow_ema = ema(c, period=slow_period)
+
+    ppo_line = (
+        pl.when(slow_ema != 0.0).then(100.0 * (fast_ema - slow_ema) / slow_ema).otherwise(0.0)
+    )
+    signal_line = ema(ppo_line, period=signal_period)
+    histogram = ppo_line - signal_line
+
+    return pl.struct(
+        [
+            ppo_line.alias("ppo"),
+            signal_line.alias("signal"),
+            histogram.alias("histogram"),
+        ]
+    )
+
+
+def coppock(
+    close: IntoExpr,
+    wma_period: int = 10,
+    fast_roc: int = 11,
+    slow_roc: int = 14,
+) -> pl.Expr:
+    """Coppock Curve.
+
+    Long-term price momentum indicator calculated as WMA of the sum of two ROCs.
+
+    :param close: price column or expression
+    :param wma_period: WMA smoothing period (default 10)
+    :param fast_roc: fast ROC period (default 11)
+    :param slow_roc: slow ROC period (default 14)
+    :return: Polars expression
+    """
+    if wma_period <= 0 or fast_roc <= 0 or slow_roc <= 0:
+        raise ValueError("periods must be positive integers greater than zero")
+    c = parse_expr(close)
+    roc_fast = roc(c, period=fast_roc)
+    roc_slow = roc(c, period=slow_roc)
+    total_roc = roc_fast + roc_slow
+
+    return wma(total_roc, period=wma_period)
+
+
+def ultimate_oscillator(
+    high: IntoExpr,
+    low: IntoExpr,
+    close: IntoExpr,
+    period1: int = 7,
+    period2: int = 14,
+    period3: int = 28,
+) -> pl.Expr:
+    """Ultimate Oscillator (UO).
+
+    Multi-timeframe momentum oscillator bounded between 0 and 100.
+
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param close: close price column or expression
+    :param period1: short lookback period (default 7)
+    :param period2: medium lookback period (default 14)
+    :param period3: long lookback period (default 28)
+    :return: Polars expression
+    """
+    if period1 <= 0 or period2 <= 0 or period3 <= 0:
+        raise ValueError("periods must be positive integers greater than zero")
+
+    hi = parse_expr(high)
+    lo = parse_expr(low)
+    c = parse_expr(close)
+    prev_close = c.shift(1)
+
+    min_l_c = pl.min_horizontal(lo, prev_close)
+    max_h_c = pl.max_horizontal(hi, prev_close)
+
+    bp = c - min_l_c
+    tr = max_h_c - min_l_c
+
+    sum_bp1 = bp.rolling_sum(window_size=period1)
+    sum_tr1 = tr.rolling_sum(window_size=period1)
+    avg1 = pl.when(sum_tr1 > 0.0).then(sum_bp1 / sum_tr1).otherwise(0.0)
+
+    sum_bp2 = bp.rolling_sum(window_size=period2)
+    sum_tr2 = tr.rolling_sum(window_size=period2)
+    avg2 = pl.when(sum_tr2 > 0.0).then(sum_bp2 / sum_tr2).otherwise(0.0)
+
+    sum_bp3 = bp.rolling_sum(window_size=period3)
+    sum_tr3 = tr.rolling_sum(window_size=period3)
+    avg3 = pl.when(sum_tr3 > 0.0).then(sum_bp3 / sum_tr3).otherwise(0.0)
+
+    return 100.0 * (4.0 * avg1 + 2.0 * avg2 + avg3) / 7.0
+
+
+def fisher_transform(
+    high: IntoExpr,
+    low: IntoExpr,
+    period: int = 9,
+) -> pl.Expr:
+    """Fisher Transform.
+
+    Converts price distribution to a Gaussian normal distribution to pinpoint turning points.
+
+    Returns a struct with fields:
+        - 'fisher': Fisher Transform line
+        - 'signal': Trigger signal line (Fisher shifted by 1)
+
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param period: lookback window (default 9)
+    :return: Polars Struct expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+
+    hi = parse_expr(high)
+    lo = parse_expr(low)
+    max_h = hi.rolling_max(window_size=period)
+    min_l = lo.rolling_min(window_size=period)
+    hl_diff = max_h - min_l
+    mid = (hi + lo) / 2.0
+
+    raw_x = pl.when(hl_diff > 0.0).then(2.0 * ((mid - min_l) / hl_diff - 0.5)).otherwise(0.0)
+    smoothed_x = raw_x.ewm_mean(span=3, adjust=False).clip(-0.999, 0.999)
+
+    fisher = 0.5 * ((1.0 + smoothed_x) / (1.0 - smoothed_x)).log()
+    signal = fisher.shift(1)
+
+    return pl.struct(
+        [
+            fisher.alias("fisher"),
+            signal.alias("signal"),
+        ]
+    )
+
+
+def rvi(
+    open: IntoExpr,
+    high: IntoExpr,
+    low: IntoExpr,
+    close: IntoExpr,
+    period: int = 14,
+) -> pl.Expr:
+    """Relative Vigor Index (RVI).
+
+    Measures conviction of price action using close-to-open and high-to-low ranges.
+
+    Returns a struct with fields:
+        - 'rvi': RVI oscillator line
+        - 'signal': 4-period triangular smoothed signal line
+
+    :param open: open price column or expression
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param close: close price column or expression
+    :param period: lookback period (default 14)
+    :return: Polars Struct expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+
+    o = parse_expr(open)
+    hi = parse_expr(high)
+    lo = parse_expr(low)
+    c = parse_expr(close)
+
+    co = c - o
+    hl = hi - lo
+
+    co_num = (co + 2.0 * co.shift(1) + 2.0 * co.shift(2) + co.shift(3)) / 6.0
+    hl_den = (hl + 2.0 * hl.shift(1) + 2.0 * hl.shift(2) + hl.shift(3)) / 6.0
+
+    sum_num = co_num.rolling_sum(window_size=period)
+    sum_den = hl_den.rolling_sum(window_size=period)
+
+    rvi_line = pl.when(sum_den > 0.0).then(sum_num / sum_den).otherwise(0.0)
+    signal = (
+        rvi_line + 2.0 * rvi_line.shift(1) + 2.0 * rvi_line.shift(2) + rvi_line.shift(3)
+    ) / 6.0
+
+    return pl.struct(
+        [
+            rvi_line.alias("rvi"),
+            signal.alias("signal"),
+        ]
+    )
+
+
+def kst(
+    close: IntoExpr,
+    r1: int = 10,
+    r2: int = 15,
+    r3: int = 20,
+    r4: int = 30,
+    s1: int = 10,
+    s2: int = 10,
+    s3: int = 10,
+    s4: int = 15,
+    signal_period: int = 9,
+) -> pl.Expr:
+    """Know Sure Thing (KST).
+
+    Martin Pring's multi-timeframe ROC momentum oscillator.
+
+    Returns a struct with fields:
+        - 'kst': KST oscillator line
+        - 'signal': SMA of KST line
+
+    :param close: price column or expression
+    :param r1: ROC 1 period (default 10)
+    :param r2: ROC 2 period (default 15)
+    :param r3: ROC 3 period (default 20)
+    :param r4: ROC 4 period (default 30)
+    :param s1: SMA 1 period (default 10)
+    :param s2: SMA 2 period (default 10)
+    :param s3: SMA 3 period (default 10)
+    :param s4: SMA 4 period (default 15)
+    :param signal_period: Signal SMA period (default 9)
+    :return: Polars Struct expression
+    """
+    c = parse_expr(close)
+    roc1_sma = roc(c, period=r1).rolling_mean(window_size=s1)
+    roc2_sma = roc(c, period=r2).rolling_mean(window_size=s2)
+    roc3_sma = roc(c, period=r3).rolling_mean(window_size=s3)
+    roc4_sma = roc(c, period=r4).rolling_mean(window_size=s4)
+
+    kst_line = roc1_sma * 1.0 + roc2_sma * 2.0 + roc3_sma * 3.0 + roc4_sma * 4.0
+    signal = kst_line.rolling_mean(window_size=signal_period)
+
+    return pl.struct(
+        [
+            kst_line.alias("kst"),
+            signal.alias("signal"),
+        ]
+    )
+
+
+def dpo(close: IntoExpr, period: int = 20) -> pl.Expr:
+    """Detrended Price Oscillator (DPO).
+
+    Eliminates trend from price to identify cycles and overbought/oversold levels.
+
+    :param close: price column or expression
+    :param period: lookback period (default 20)
+    :return: Polars expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    c = parse_expr(close)
+    shift_k = period // 2 + 1
+    return c - c.rolling_mean(window_size=period).shift(shift_k)
+
+
+def bop(
+    open: IntoExpr,
+    high: IntoExpr,
+    low: IntoExpr,
+    close: IntoExpr,
+) -> pl.Expr:
+    """Balance of Power (BOP).
+
+    Evaluates the strength of buyers and sellers by comparing close-open to high-low.
+
+    :param open: open price column or expression
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param close: close price column or expression
+    :return: Polars expression in [-1, 1]
+    """
+    o = parse_expr(open)
+    hi = parse_expr(high)
+    lo = parse_expr(low)
+    c = parse_expr(close)
+    spread = hi - lo
+
+    return pl.when(spread > 0.0).then((c - o) / spread).otherwise(0.0)
+
+
+def cfo(close: IntoExpr, period: int = 14) -> pl.Expr:
+    """Chande Forecast Oscillator (CFO).
+
+    Computes percentage difference between actual price and linear regression line.
+
+    :param close: price column or expression
+    :param period: linear regression period (default 14)
+    :return: Polars expression
+    """
+    if period <= 1:
+        raise ValueError("period must be an integer greater than 1")
+
+    n = float(period)
+    mean_x = (n - 1.0) / 2.0
+    sum_x_sq = n * (n * n - 1.0) / 12.0
+
+    c = parse_expr(close)
+    # Vectorized covariance sum( (i - mean_x) * close.shift(period - 1 - i) )
+    cov_terms = sum(c.shift(period - 1 - i) * (float(i) - mean_x) for i in range(period))
+    slope = cov_terms / sum_x_sq
+    forecast = c.rolling_mean(window_size=period) + slope * (n - 1.0 - mean_x)
+
+    return pl.when(c != 0.0).then(100.0 * (c - forecast) / c).otherwise(0.0)

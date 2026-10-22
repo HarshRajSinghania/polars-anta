@@ -5,7 +5,27 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from polars_ta.trend import adx, dema, ema, hma, sma, tema, vortex, wma, zlema
+from polars_ta.trend import (
+    adx,
+    alma,
+    aroon,
+    chop,
+    dema,
+    ema,
+    hma,
+    kama,
+    mass_index,
+    mcginley_dynamic,
+    psar,
+    sma,
+    supertrend,
+    t3,
+    tema,
+    vidya,
+    vortex,
+    wma,
+    zlema,
+)
 
 
 def test_sma(sample_ohlcv_df: pl.DataFrame):
@@ -138,3 +158,85 @@ def test_adx(sample_ohlcv_df: pl.DataFrame):
     assert len(adx_vals) > 0
     for a in adx_vals:
         assert 0.0 <= a <= 100.0
+
+
+def test_aroon(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(aroon("high", "low", period=10).alias("aroon")).unnest("aroon")
+    assert "aroon_up" in result.columns
+    assert "aroon_down" in result.columns
+    assert "oscillator" in result.columns
+
+    up = [x for x in result["aroon_up"].to_list() if x is not None]
+    down = [x for x in result["aroon_down"].to_list() if x is not None]
+    assert len(up) > 0
+    for u in up:
+        assert 0.0 <= u <= 100.0
+    for d in down:
+        assert 0.0 <= d <= 100.0
+
+
+def test_chop(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(chop("high", "low", "close", period=10).alias("chop"))
+    vals = [x for x in result["chop"].to_list() if x is not None]
+    assert len(vals) > 0
+    for c in vals:
+        assert 0.0 <= c <= 100.0
+
+
+def test_t3(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(t3("close", period=5).alias("t3"))
+    vals = [x for x in result["t3"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_alma(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(alma("close", period=9).alias("alma"))
+    vals = [x for x in result["alma"].to_list() if x is not None]
+    assert len(vals) > 0
+    assert 100.0 < vals[-1] < 150.0
+
+
+def test_mass_index(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        mass_index("high", "low", fast_period=3, slow_period=10).alias("mi")
+    )
+    vals = [x for x in result["mi"].to_list() if x is not None]
+    assert len(vals) > 0
+    for m in vals:
+        assert m > 0.0
+
+
+def test_supertrend(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        supertrend("high", "low", "close", period=5, multiplier=2.0).alias("st")
+    ).unnest("st")
+    assert "supertrend" in result.columns
+    assert "direction" in result.columns
+    dirs = [x for x in result["direction"].to_list() if x is not None]
+    assert len(dirs) > 0
+    for d in dirs:
+        assert d in (1, -1)
+
+
+def test_psar(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(psar("high", "low").alias("psar"))
+    vals = [x for x in result["psar"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_kama(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(kama("close", period=10).alias("kama"))
+    vals = [x for x in result["kama"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_mcginley_dynamic(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(mcginley_dynamic("close", period=10).alias("md"))
+    vals = [x for x in result["md"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_vidya(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(vidya("close", period=5, cmo_period=5).alias("vidya"))
+    vals = [x for x in result["vidya"].to_list() if x is not None]
+    assert len(vals) > 0
