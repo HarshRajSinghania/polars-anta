@@ -40,6 +40,13 @@ dependencies = [
     "polars>=1.0.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/polars-ta/polars-ta"
+Documentation = "https://polars-ta.github.io/polars-ta/"
+Repository = "https://github.com/polars-ta/polars-ta.git"
+Issues = "https://github.com/polars-ta/polars-ta/issues"
+Changelog = "https://github.com/polars-ta/polars-ta/releases"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
