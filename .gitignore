@@ -1,6 +1,6 @@
 # Local learning notes & internal files (NEVER commit or push)
-NOTE_LO_TRINH_*.md
-LAUNCH_KIT_*.md
+NOTE_*.md
+LAUNCH_*.md
 *.note.md
 *.local.*
 .venv/

@@ -10,7 +10,7 @@
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Zero C Dependencies](https://img.shields.io/badge/dependencies-pure%20polars-brightgreen)](#)
 
-[Documentation](https://polars-anta.github.io/polars-anta/) • [Features](#key-features) • [Benchmark](#performance-benchmark-1000000-rows) • [Installation](#installation) • [Quickstart](#quickstart) • [Tutorials](#3-interactive-jupyter-notebooks) • [Indicators](#supported-indicators-100-indicators) • [Development](#development--testing)
+[Documentation](https://huuan26.github.io/polars-anta/) • [Features](#key-features) • [Benchmark](#performance-benchmark-1000000-rows) • [Installation](#installation) • [Quickstart](#quickstart) • [Tutorials](#3-interactive-jupyter-notebooks) • [Indicators](#supported-indicators-100-indicators) • [Development](#development--testing)
 
 </div>
 
@@ -130,8 +130,8 @@ Run our interactive tutorials directly in your browser with zero setup:
 
 | Notebook | Description | Interactive Demo |
 | :--- | :--- | :---: |
-| **01 - Quickstart Tutorial** | Comprehensive walk-through of expression syntax, Struct unnesting, and plotting. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-anta/polars-anta/blob/master/examples/01_quickstart.ipynb) |
-| **02 - Multi-Asset Portfolio Scan** | Real-world 500-ticker breakout screening in 50 milliseconds using `.over("ticker")`. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-anta/polars-anta/blob/master/examples/02_multi_asset_portfolio_scan.ipynb) |
+| **01 - Quickstart Tutorial** | Comprehensive walk-through of expression syntax, Struct unnesting, and plotting. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/huuan26/polars-anta/blob/master/examples/01_quickstart.ipynb) |
+| **02 - Multi-Asset Portfolio Scan** | Real-world 500-ticker breakout screening in 50 milliseconds using `.over("ticker")`. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/huuan26/polars-anta/blob/master/examples/02_multi_asset_portfolio_scan.ipynb) |
 
 ---
 
@@ -265,7 +265,7 @@ Run our interactive tutorials directly in your browser with zero setup:
 
 ```bash
 # Clone the repository
-git clone https://github.com/polars-anta/polars-anta.git
+git clone https://github.com/huuan26/polars-anta.git
 cd polars-anta
 
 # Install in editable mode with development dependencies
@@ -284,8 +284,8 @@ ruff format --check .
 ## Author & Community
 
 - **Author**: An Phan (Phan Bùi Hữu Ân) - [phanbuihuuan261103@gmail.com](mailto:phanbuihuuan261103@gmail.com)
-- **GitHub**: [@polars-anta](https://github.com/polars-anta/polars-anta)
-- **Discussion & Feature Requests**: [GitHub Discussions](https://github.com/polars-anta/polars-anta/discussions)
+- **GitHub**: [@huuan26](https://github.com/huuan26/polars-anta)
+- **Discussion & Feature Requests**: [GitHub Discussions](https://github.com/huuan26/polars-anta/discussions)
 
 ---
 

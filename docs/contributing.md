@@ -8,7 +8,7 @@ We welcome contributions from quantitative researchers, Python developers, and t
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/polars-anta/polars-anta.git
+   git clone https://github.com/huuan26/polars-anta.git
    cd polars-anta
    ```
 

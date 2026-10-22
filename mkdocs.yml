@@ -1,9 +1,9 @@
 site_name: polars-anta
 site_description: ANTA (Alpha & Numerical Technical Analysis) - Ultra-fast, zero-C technical analysis and factor library for Polars.
 site_author: An Phan (Phan Bùi Hữu Ân)
-site_url: https://polars-anta.github.io/polars-anta/
-repo_url: https://github.com/polars-anta/polars-anta
-repo_name: polars-anta/polars-anta
+site_url: https://huuan26.github.io/polars-anta/
+repo_url: https://github.com/huuan26/polars-anta
+repo_name: huuan26/polars-anta
 
 theme:
   name: material

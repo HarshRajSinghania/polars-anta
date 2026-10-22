@@ -42,11 +42,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/polars-anta/polars-anta"
-Documentation = "https://polars-anta.github.io/polars-anta/"
-Repository = "https://github.com/polars-anta/polars-anta.git"
-Issues = "https://github.com/polars-anta/polars-anta/issues"
-Changelog = "https://github.com/polars-anta/polars-anta/releases"
+Homepage = "https://github.com/huuan26/polars-anta"
+Documentation = "https://huuan26.github.io/polars-anta/"
+Repository = "https://github.com/huuan26/polars-anta.git"
+Issues = "https://github.com/huuan26/polars-anta/issues"
+Changelog = "https://github.com/huuan26/polars-anta/releases"
 
 [project.optional-dependencies]
 dev = [
