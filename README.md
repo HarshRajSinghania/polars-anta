@@ -5,6 +5,7 @@
 **ANTA (Alpha & Numerical Technical Analysis): Ultra-fast, zero-C-dependency technical analysis and factor library powered natively by Polars Expressions.**
 
 [![CI](https://github.com/huuan26/polars-anta/actions/workflows/ci.yml/badge.svg)](https://github.com/huuan26/polars-anta/actions/workflows/ci.yml)
+[![PyPI Version](https://img.shields.io/pypi/v/polars-anta.svg?color=blue)](https://pypi.org/project/polars-anta/)
 [![Docs](https://github.com/huuan26/polars-anta/actions/workflows/docs.yml/badge.svg)](https://huuan26.github.io/polars-anta/)
 [![Release](https://img.shields.io/github/v/release/huuan26/polars-anta?color=blue)](https://github.com/huuan26/polars-anta/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
