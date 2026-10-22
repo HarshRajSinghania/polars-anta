@@ -1,8 +1,8 @@
 <div align="center">
 
-# ⚡ polars-ta
+# polars-ta
 
-**Lightning-fast, zero-C-dependency Technical Analysis & Factor Library powered natively by Polars Expressions.**
+**High-performance, zero-C-dependency technical analysis and alpha factor library powered natively by Polars Expressions.**
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org)
@@ -10,57 +10,57 @@
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Zero C Dependencies](https://img.shields.io/badge/dependencies-pure%20polars-brightgreen)](#)
 
-[English](README.md) • [Features](#key-features) • [Quickstart](#quickstart) • [Indicators](#supported-indicators) • [Benchmarks](#performance-philosophy)
+[Features](#key-features) • [Comparison](#why-polars-ta) • [Installation](#installation) • [Quickstart](#quickstart) • [Indicators](#supported-indicators) • [Development](#development--testing)
 
 </div>
 
 ---
 
-## 🎯 Why `polars-ta`?
+## Why `polars-ta`?
 
-Quantitative researchers and financial engineers have long struggled with technical analysis tooling:
+Quantitative researchers and financial engineers have historically faced a trade-off between installation complexity and computation speed:
 
-| Challenge | TA-Lib | pandas-ta | **`polars-ta`** |
+| Capability | TA-Lib | pandas-ta | `polars-ta` |
 | :--- | :---: | :---: | :---: |
-| **Dependencies** | Requires external C library & MSVC / gcc compiler | Pure Python / NumPy | **Zero C compilation** (pure Polars) |
-| **Execution Engine** | Single-threaded C loops | Single-threaded Pandas / Python GIL | **Multi-threaded Rust** query engine |
-| **Multi-Asset Scaling** | Manual loops | Slow `.groupby().apply()` | **Native `.over("ticker")`** in parallel |
-| **Lazy Evaluation** | ❌ No | ❌ No | ✅ Full **`pl.LazyFrame`** streaming support |
-| **Memory Footprint** | Copies arrays back & forth | High Pandas memory overhead | **Zero-copy Arrow memory format** |
+| **Dependencies** | Requires external C library & MSVC / GCC | Pure Python / NumPy | **Zero C compilation** (pure Polars) |
+| **Execution Engine** | Single-threaded C loops | Single-threaded Pandas / GIL | **Multi-threaded Rust** query engine |
+| **Multi-Asset Scaling** | Manual sequential loops | Slow `.groupby().apply()` | **Native `.over("ticker")`** parallelization |
+| **Lazy Evaluation** | Unsupported | Unsupported | **Full `pl.LazyFrame`** streaming support |
+| **Memory Layout** | Array conversion overhead | High Pandas memory footprint | **Zero-copy Arrow memory format** |
 
-`polars-ta` solves this by expressing financial indicators directly as **Polars Expressions (`pl.Expr`)**. There is no overhead, no Python GIL bottleneck, and zero compilation headache.
+`polars-ta` eliminates this compromise by implementing financial indicators directly as **Polars Expressions (`pl.Expr`)**. Computations are pushed into Polars' multi-threaded Rust engine, eliminating Python GIL bottlenecks without requiring any C compilers.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-- **Expression-First Design**: Chain indicators seamlessly into `.select()`, `.with_columns()`, and lazy query plans.
-- **Parallel Across 5,000+ Assets**: Process market-wide datasets effortlessly using native Polars grouping:
+- **Expression-First Design**: Compose indicators directly within `.select()`, `.with_columns()`, and lazy query plans.
+- **Parallel Multi-Asset Computation**: Compute indicators across thousands of tickers in parallel using Polars' native window context:
   ```python
   pl.col("close").ta.rsi(14).over("symbol")
   ```
-- **Struct Output for Multi-Line Indicators**: Indicators like MACD, Bollinger Bands, and Stochastic return structured columns (`pl.Struct`) that preserve clean schemas.
-- **Zero-C Compilation**: `pip install polars-ta` installs immediately on Linux, macOS, and Windows without requiring GCC, Clang, or Visual Studio Build Tools.
+- **Structured Outputs**: Multi-component indicators (MACD, Bollinger Bands, Stochastic, Keltner Channels) return typed `pl.Struct` expressions that maintain clean schemas.
+- **Zero-C Compilation**: `pip install polars-ta` works out of the box across Linux, macOS, and Windows.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 pip install polars-ta
 ```
 
-*(Requirements: Python >= 3.10, Polars >= 1.0.0)*
+*Requirements: Python >= 3.10, Polars >= 1.0.0*
 
 ---
 
-## ⚡ Quickstart
+## Quickstart
 
 ### 1. Modern Chained Expression Syntax (`.ta`)
 
 ```python
 import polars as pl
-import polars_ta  # Registers the `.ta` accessor
+import polars_ta  # Registers the `.ta` expression namespace
 
 df = pl.DataFrame(
     {
@@ -72,24 +72,24 @@ df = pl.DataFrame(
     }
 )
 
-# Compute technical indicators effortlessly
-res = df.with_columns(
+# Compute indicators directly on expressions
+result = df.with_columns(
     pl.col("close").ta.sma(period=3).alias("sma_3"),
     pl.col("close").ta.rsi(period=3).alias("rsi_3"),
     pl.col("close").ta.bollinger_bands(period=3).alias("bb"),
 )
 
-# Unnest structured outputs when needed
-print(res.unnest("bb"))
+# Unnest structured outputs as needed
+print(result.unnest("bb"))
 ```
 
 ### 2. Market-Wide Multi-Asset Parallel Execution
 
-One of the biggest pain points in financial analysis is running indicators across thousands of tickers. With `polars-ta`, Rust handles thread scheduling across all CPU cores automatically:
+Running technical indicators across an entire investment universe is a common bottleneck. In `polars-ta`, Polars distributes evaluation across all CPU cores automatically:
 
 ```python
-# Compute indicators across thousands of symbols simultaneously
-dataset.with_columns(
+# Compute indicators across thousands of symbols simultaneously in Rust
+universe.with_columns(
     [
         pl.col("close").ta.sma(20).over("ticker").alias("sma_20"),
         pl.col("close").ta.rsi(14).over("ticker").alias("rsi_14"),
@@ -101,27 +101,27 @@ dataset.with_columns(
 
 ---
 
-## 📊 Supported Indicators (Phase 1)
+## Supported Indicators
 
-### 📈 Trend
+### Trend
 - **`sma(close, period=10)`**: Simple Moving Average
 - **`ema(close, period=10)`**: Exponential Moving Average
 - **`wma(close, period=10)`**: Linearly-Weighted Moving Average
 - **`hma(close, period=10)`**: Hull Moving Average
 
-### ⚡ Momentum
+### Momentum
 - **`rsi(close, period=14)`**: Relative Strength Index (Wilder's smoothing)
 - **`macd(close, fast=12, slow=26, signal=9)`**: Moving Average Convergence Divergence
 - **`stochastic(high, low, close, k=14, d=3)`**: Stochastic Oscillator (%K, %D)
 - **`williams_r(high, low, close, period=14)`**: Williams %R
 
-### 🌊 Volatility
+### Volatility
 - **`true_range(high, low, close)`**: True Range
 - **`atr(high, low, close, period=14)`**: Average True Range
 - **`bollinger_bands(close, period=20, num_std=2.0)`**: Bollinger Bands (Upper, Middle, Lower, Bandwidth, %B)
 - **`keltner_channels(high, low, close, ema=20, atr=10, multiplier=2.0)`**: Keltner Channels
 
-### 🔊 Volume
+### Volume
 - **`obv(close, volume)`**: On-Balance Volume
 - **`vwap(high, low, close, volume, period=None)`**: Volume Weighted Average Price (Cumulative or Rolling)
 - **`vwma(close, volume, period=20)`**: Volume Weighted Moving Average
@@ -130,33 +130,36 @@ dataset.with_columns(
 
 ---
 
-## 🏎️ Performance Philosophy
+## Architecture & Performance
 
-Traditional libraries loop over rows or transfer arrays between C and Python memory space. `polars-ta` is designed from the ground up to:
+`polars-ta` is designed around three architectural pillars:
 
-1. **Leverage Arrow Memory**: Zero copy between indicator transformations.
-2. **Exploit Vectorized Kernels**: Native SIMD instructions in Polars.
-3. **Integrate with LazyFrame Optimizer**: Redundant computations are eliminated during query plan optimization.
+1. **Arrow Memory Layout**: Avoids memory copying between indicator transformations.
+2. **SIMD-Accelerated Vectorization**: Executes through Polars' optimized analytical kernels.
+3. **Query Optimization**: Integrates with Polars' expression engine for predicate pushdown and dead-code elimination.
 
 ---
 
-## 🛠️ Development & Testing
+## Development & Testing
 
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/polars-ta.git
 cd polars-ta
 
-# Run tests
+# Install in editable mode with development dependencies
+pip install -e .[dev]
+
+# Run the test suite
 pytest -v
 
-# Run code linter & formatter
+# Run linter and formatter checks
 ruff check .
-ruff format .
+ruff format --check .
 ```
 
 ---
 
-## 📜 License
+## License
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
