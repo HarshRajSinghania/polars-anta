@@ -67,3 +67,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
+        continue-on-error: true
