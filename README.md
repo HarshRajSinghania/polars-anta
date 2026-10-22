@@ -32,6 +32,29 @@ Quantitative researchers and financial engineers have historically faced a trade
 
 ---
 
+## Performance Benchmark (1,000,000 Rows)
+
+<div align="center">
+
+<img src="benchmarks/benchmark_speed.png" alt="polars-ta Performance Benchmark" width="920"/>
+
+</div>
+
+Benchmarks measured across **1,000,000 bars** (single-asset random walk) and a **500 tickers x 2,000 bars universe**. Computations executed on Polars' multi-threaded Rust query engine vs single-threaded Pandas:
+
+| Operation / Indicator | Dataset Scale | Pandas Execution | `polars-ta` Execution | Measured Speedup |
+| :--- | :--- | :---: | :---: | :---: |
+| **Linear Regression Slope** | 1,000,000 bars | 2.3529 s | **0.0209 s** | **112.4x Faster** |
+| **Multi-Asset RSI** | 500 tickers x 2k bars | 0.4398 s | **0.0545 s** | **8.1x Faster** |
+| **Multi-Asset SMA** | 500 tickers x 2k bars | 0.1345 s | **0.0168 s** | **8.0x Faster** |
+| **Z-Score Normalization** | 1,000,000 bars | 0.0450 s | **0.0267 s** | **1.7x Faster** |
+| **Exponential Moving Average** | 1,000,000 bars | 0.0100 s | **0.0069 s** | **1.5x Faster** |
+| **Simple Moving Average** | 1,000,000 bars | 0.0170 s | **0.0153 s** | **1.1x Faster** |
+
+*Reproduce benchmarks locally using `pip install -e .[benchmark]` followed by `python benchmarks/benchmark_speed.py`.*
+
+---
+
 ## Key Features
 
 - **Expression-First Design**: Compose indicators directly within `.select()`, `.with_columns()`, and lazy query plans.
