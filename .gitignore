@@ -1,0 +1,15 @@
+# Local learning notes & internal files (NEVER commit or push)
+NOTE_LO_TRINH_*.md
+*.note.md
+*.local.*
+.venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/

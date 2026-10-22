@@ -1,0 +1,26 @@
+name: 🚀 Feature Request
+description: Suggest an idea or new indicator for polars-ta
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for suggesting a new feature or technical indicator!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear description of the use case or indicator needed.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution or Mathematical Formula
+      description: Mathematical formula, standard reference (e.g. TA-Lib / TradingView / Wilder), or expected output.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Additional context or references
+      description: Links to papers, documentation, or alternative implementations.
