@@ -4,34 +4,18 @@ from __future__ import annotations
 
 import polars as pl
 
-from .core import IntoExpr, parse_expr, wilder_smooth
+from .core import IntoExpr, parse_expr, true_range, wilder_smooth
 from .trend import ema
 
-
-def true_range(
-    high: IntoExpr,
-    low: IntoExpr,
-    close: IntoExpr,
-) -> pl.Expr:
-    """True Range (TR).
-
-    TR = max(High - Low, |High - Close_prev|, |Low - Close_prev|)
-
-    :param high: high price column or expression
-    :param low: low price column or expression
-    :param close: close price column or expression
-    :return: Polars expression
-    """
-    hi = parse_expr(high)
-    lo = parse_expr(low)
-    c = parse_expr(close)
-    prev_close = c.shift(1)
-
-    hl = hi - lo
-    hc = (hi - prev_close).abs()
-    lc = (lo - prev_close).abs()
-
-    return pl.max_horizontal(hl, hc, lc)
+__all__ = [
+    "true_range",
+    "atr",
+    "bollinger_bands",
+    "keltner_channels",
+    "donchian_channels",
+    "stddev",
+    "ulcer_index",
+]
 
 
 def atr(
@@ -145,3 +129,72 @@ def keltner_channels(
             lower.alias("lower"),
         ]
     )
+
+
+def donchian_channels(
+    high: IntoExpr,
+    low: IntoExpr,
+    period: int = 20,
+) -> pl.Expr:
+    """Donchian Channels.
+
+    Returns a struct with fields:
+        - 'upper': highest high over lookback period
+        - 'middle': average of upper and lower channel
+        - 'lower': lowest low over lookback period
+
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param period: lookback period (default 20)
+    :return: Polars Struct expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    hi = parse_expr(high)
+    lo = parse_expr(low)
+
+    upper = hi.rolling_max(window_size=period)
+    lower = lo.rolling_min(window_size=period)
+    middle = (upper + lower) / 2.0
+
+    return pl.struct(
+        [
+            upper.alias("upper"),
+            middle.alias("middle"),
+            lower.alias("lower"),
+        ]
+    )
+
+
+def stddev(close: IntoExpr, period: int = 20) -> pl.Expr:
+    """Rolling Standard Deviation (Volatility).
+
+    :param close: price column name or expression
+    :param period: lookback period (default 20)
+    :return: Polars expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    return parse_expr(close).rolling_std(window_size=period)
+
+
+def ulcer_index(close: IntoExpr, period: int = 14) -> pl.Expr:
+    """Ulcer Index (UI).
+
+    Technical indicator that measures downside risk and drawdown severity over a rolling period.
+
+    :param close: price column name or expression
+    :param period: lookback period (default 14)
+    :return: Polars expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    c = parse_expr(close)
+    highest_close = c.rolling_max(window_size=period)
+    drawdown_pct = (
+        pl.when(highest_close > 0.0)
+        .then(100.0 * (c - highest_close) / highest_close)
+        .otherwise(0.0)
+    )
+    drawdown_sq = drawdown_pct.pow(2)
+    return drawdown_sq.rolling_mean(window_size=period).sqrt()

@@ -4,7 +4,15 @@ from __future__ import annotations
 
 import polars as pl
 
-from polars_ta.volatility import atr, bollinger_bands, keltner_channels, true_range
+from polars_ta.volatility import (
+    atr,
+    bollinger_bands,
+    donchian_channels,
+    keltner_channels,
+    stddev,
+    true_range,
+    ulcer_index,
+)
 
 
 def test_true_range(sample_ohlcv_df: pl.DataFrame):
@@ -12,7 +20,6 @@ def test_true_range(sample_ohlcv_df: pl.DataFrame):
     tr_vals = result["tr"].to_list()
 
     assert len(tr_vals) == len(sample_ohlcv_df)
-    # TR on positive price ranges must be strictly positive (excluding potential first shift)
     for v in tr_vals[1:]:
         assert v > 0.0
 
@@ -37,7 +44,6 @@ def test_bollinger_bands(sample_ohlcv_df: pl.DataFrame):
     middles = result["middle"].to_list()
     lowers = result["lower"].to_list()
 
-    # For valid window rows, upper > middle > lower
     for u, m, low_val in zip(uppers[9:], middles[9:], lowers[9:], strict=True):
         assert u > m > low_val
 
@@ -57,3 +63,33 @@ def test_keltner_channels(sample_ohlcv_df: pl.DataFrame):
 
     for u, m, low_val in zip(uppers[10:], middles[10:], lowers[10:], strict=True):
         assert u > m > low_val
+
+
+def test_donchian_channels(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(donchian_channels("high", "low", period=10).alias("dc")).unnest(
+        "dc"
+    )
+
+    assert set(result.columns) == {"upper", "middle", "lower"}
+    uppers = result["upper"].to_list()
+    middles = result["middle"].to_list()
+    lowers = result["lower"].to_list()
+
+    for u, m, low_val in zip(uppers[9:], middles[9:], lowers[9:], strict=True):
+        assert u >= m >= low_val
+
+
+def test_stddev(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(stddev("close", period=10).alias("std"))
+    vals = [x for x in result["std"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_ulcer_index(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(ulcer_index("close", period=10).alias("ui"))
+    vals = [x for x in result["ui"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0

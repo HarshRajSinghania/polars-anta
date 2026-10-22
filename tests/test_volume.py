@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from polars_ta.volume import adl, cmf, obv, vwap, vwma
+from polars_ta.volume import adl, cmf, eom, mfi, obv, vwap, vwma
 
 
 def test_obv(sample_ohlcv_df: pl.DataFrame):
@@ -12,7 +12,6 @@ def test_obv(sample_ohlcv_df: pl.DataFrame):
     obv_vals = result["obv"].to_list()
 
     assert len(obv_vals) == len(sample_ohlcv_df)
-    # OBV should not have NaNs/nulls
     assert all(x is not None for x in obv_vals)
 
 
@@ -30,7 +29,6 @@ def test_vwap_rolling(sample_ohlcv_df: pl.DataFrame):
         vwap("high", "low", "close", "volume", period=5).alias("vwap_5")
     )
     vals = result["vwap_5"].to_list()
-    # first 4 should be None
     assert all(x is None for x in vals[:4])
     assert all(x is not None for x in vals[4:])
 
@@ -48,7 +46,6 @@ def test_cmf(sample_ohlcv_df: pl.DataFrame):
     vals = [x for x in result["cmf"].to_list() if x is not None]
 
     assert len(vals) > 0
-    # CMF is oscillator between -1.0 and 1.0
     for v in vals:
         assert -1.0 <= v <= 1.0
 
@@ -59,3 +56,17 @@ def test_adl(sample_ohlcv_df: pl.DataFrame):
 
     assert len(vals) == len(sample_ohlcv_df)
     assert all(x is not None for x in vals)
+
+
+def test_mfi(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(mfi("high", "low", "close", "volume", period=10).alias("mfi"))
+    vals = [x for x in result["mfi"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert 0.0 <= v <= 100.0
+
+
+def test_eom(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(eom("high", "low", "volume", period=10).alias("eom"))
+    vals = [x for x in result["eom"].to_list() if x is not None]
+    assert len(vals) > 0

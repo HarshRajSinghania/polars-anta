@@ -101,25 +101,38 @@ universe.with_columns(
 
 ---
 
-## Supported Indicators
+## Supported Indicators (32 Indicators)
 
 ### Trend
 - **`sma(close, period=10)`**: Simple Moving Average
 - **`ema(close, period=10)`**: Exponential Moving Average
 - **`wma(close, period=10)`**: Linearly-Weighted Moving Average
 - **`hma(close, period=10)`**: Hull Moving Average
+- **`dema(close, period=10)`**: Double Exponential Moving Average
+- **`tema(close, period=10)`**: Triple Exponential Moving Average
+- **`zlema(close, period=10)`**: Zero-Lag Exponential Moving Average
+- **`vortex(high, low, close, period=14)`**: Vortex Indicator (`vi_plus`, `vi_minus`)
+- **`adx(high, low, close, period=14)`**: Average Directional Index (`adx`, `plus_di`, `minus_di`)
 
 ### Momentum
 - **`rsi(close, period=14)`**: Relative Strength Index (Wilder's smoothing)
 - **`macd(close, fast=12, slow=26, signal=9)`**: Moving Average Convergence Divergence
 - **`stochastic(high, low, close, k=14, d=3)`**: Stochastic Oscillator (%K, %D)
 - **`williams_r(high, low, close, period=14)`**: Williams %R
+- **`cci(high, low, close, period=20)`**: Commodity Channel Index
+- **`roc(close, period=10)`**: Rate of Change (Momentum %)
+- **`stoch_rsi(close, rsi_period=14, stoch_period=14)`**: Stochastic RSI (%K, %D)
+- **`awesome_oscillator(high, low, fast=5, slow=34)`**: Awesome Oscillator (AO)
+- **`tsi(close, long_period=25, short_period=13)`**: True Strength Index (TSI)
 
 ### Volatility
 - **`true_range(high, low, close)`**: True Range
 - **`atr(high, low, close, period=14)`**: Average True Range
 - **`bollinger_bands(close, period=20, num_std=2.0)`**: Bollinger Bands (Upper, Middle, Lower, Bandwidth, %B)
 - **`keltner_channels(high, low, close, ema=20, atr=10, multiplier=2.0)`**: Keltner Channels
+- **`donchian_channels(high, low, period=20)`**: Donchian Channels (Upper, Middle, Lower)
+- **`stddev(close, period=20)`**: Rolling Standard Deviation
+- **`ulcer_index(close, period=14)`**: Ulcer Index (Downside Drawdown Risk)
 
 ### Volume
 - **`obv(close, volume)`**: On-Balance Volume
@@ -127,6 +140,8 @@ universe.with_columns(
 - **`vwma(close, volume, period=20)`**: Volume Weighted Moving Average
 - **`cmf(high, low, close, volume, period=20)`**: Chaikin Money Flow
 - **`adl(high, low, close, volume)`**: Accumulation/Distribution Line
+- **`mfi(high, low, close, volume, period=14)`**: Money Flow Index
+- **`eom(high, low, volume, period=14)`**: Ease of Movement (EMV)
 
 ---
 

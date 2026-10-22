@@ -28,7 +28,10 @@ class TechnicalAnalysisExpr:
     def __init__(self, expr: pl.Expr) -> None:
         self._expr = expr
 
+    # =========================================================================
     # Trend Indicators
+    # =========================================================================
+
     def sma(self, period: int = 10) -> pl.Expr:
         """Simple Moving Average (SMA)."""
         return trend.sma(self._expr, period=period)
@@ -45,7 +48,40 @@ class TechnicalAnalysisExpr:
         """Hull Moving Average (HMA)."""
         return trend.hma(self._expr, period=period)
 
+    def dema(self, period: int = 10) -> pl.Expr:
+        """Double Exponential Moving Average (DEMA)."""
+        return trend.dema(self._expr, period=period)
+
+    def tema(self, period: int = 10) -> pl.Expr:
+        """Triple Exponential Moving Average (TEMA)."""
+        return trend.tema(self._expr, period=period)
+
+    def zlema(self, period: int = 10) -> pl.Expr:
+        """Zero-Lag Exponential Moving Average (ZLEMA)."""
+        return trend.zlema(self._expr, period=period)
+
+    def vortex(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        period: int = 14,
+    ) -> pl.Expr:
+        """Vortex Indicator (VI)."""
+        return trend.vortex(high=high, low=low, close=self._expr, period=period)
+
+    def adx(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        period: int = 14,
+    ) -> pl.Expr:
+        """Average Directional Index (ADX) and (+DI, -DI)."""
+        return trend.adx(high=high, low=low, close=self._expr, period=period)
+
+    # =========================================================================
     # Momentum Indicators
+    # =========================================================================
+
     def rsi(self, period: int = 14) -> pl.Expr:
         """Relative Strength Index (RSI)."""
         return momentum.rsi(self._expr, period=period)
@@ -96,7 +132,73 @@ class TechnicalAnalysisExpr:
             period=period,
         )
 
+    def cci(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        period: int = 20,
+        constant: float = 0.015,
+    ) -> pl.Expr:
+        """Commodity Channel Index (CCI)."""
+        return momentum.cci(
+            high=high,
+            low=low,
+            close=self._expr,
+            period=period,
+            constant=constant,
+        )
+
+    def roc(self, period: int = 10) -> pl.Expr:
+        """Rate of Change (ROC)."""
+        return momentum.roc(self._expr, period=period)
+
+    def stoch_rsi(
+        self,
+        rsi_period: int = 14,
+        stoch_period: int = 14,
+        k_period: int = 3,
+        d_period: int = 3,
+    ) -> pl.Expr:
+        """Stochastic RSI (StochRSI)."""
+        return momentum.stoch_rsi(
+            self._expr,
+            rsi_period=rsi_period,
+            stoch_period=stoch_period,
+            k_period=k_period,
+            d_period=d_period,
+        )
+
+    def awesome_oscillator(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        fast_period: int = 5,
+        slow_period: int = 34,
+    ) -> pl.Expr:
+        """Awesome Oscillator (AO)."""
+        return momentum.awesome_oscillator(
+            high=high,
+            low=low,
+            fast_period=fast_period,
+            slow_period=slow_period,
+        )
+
+    def tsi(
+        self,
+        long_period: int = 25,
+        short_period: int = 13,
+    ) -> pl.Expr:
+        """True Strength Index (TSI)."""
+        return momentum.tsi(
+            self._expr,
+            long_period=long_period,
+            short_period=short_period,
+        )
+
+    # =========================================================================
     # Volatility Indicators
+    # =========================================================================
+
     def true_range(
         self,
         high: IntoExpr,
@@ -140,7 +242,27 @@ class TechnicalAnalysisExpr:
             multiplier=multiplier,
         )
 
+    def donchian_channels(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        period: int = 20,
+    ) -> pl.Expr:
+        """Donchian Channels."""
+        return volatility.donchian_channels(high=high, low=low, period=period)
+
+    def stddev(self, period: int = 20) -> pl.Expr:
+        """Rolling Standard Deviation."""
+        return volatility.stddev(self._expr, period=period)
+
+    def ulcer_index(self, period: int = 14) -> pl.Expr:
+        """Ulcer Index (UI)."""
+        return volatility.ulcer_index(self._expr, period=period)
+
+    # =========================================================================
     # Volume Indicators
+    # =========================================================================
+
     def obv(self, volume_col: IntoExpr) -> pl.Expr:
         """On-Balance Volume (OBV)."""
         return volume.obv(close=self._expr, volume=volume_col)
@@ -193,4 +315,37 @@ class TechnicalAnalysisExpr:
             low=low,
             close=self._expr,
             volume=volume_col,
+        )
+
+    def mfi(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        volume_col: IntoExpr,
+        period: int = 14,
+    ) -> pl.Expr:
+        """Money Flow Index (MFI)."""
+        return volume.mfi(
+            high=high,
+            low=low,
+            close=self._expr,
+            volume=volume_col,
+            period=period,
+        )
+
+    def eom(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        volume_col: IntoExpr,
+        period: int = 14,
+        divisor: float = 100_000_000.0,
+    ) -> pl.Expr:
+        """Ease of Movement (EOM)."""
+        return volume.eom(
+            high=high,
+            low=low,
+            volume=volume_col,
+            period=period,
+            divisor=divisor,
         )
