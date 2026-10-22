@@ -416,3 +416,109 @@ def donchian_width(
     middle = (upper + lower) / 2.0
 
     return pl.when(middle > 0.0).then(100.0 * (upper - lower) / middle).otherwise(0.0)
+
+
+def envelopes(
+    close: IntoExpr,
+    period: int = 20,
+    percentage: float = 0.025,
+) -> pl.Expr:
+    """Moving Average Envelopes.
+
+    Trading bands plotted above and below a moving average by a fixed percentage.
+    Returns Struct with: `upper`, `middle`, `lower`.
+
+    :param close: price column or expression
+    :param period: moving average period (default 20)
+    :param percentage: band percentage offset as a decimal (e.g. 0.025 for 2.5%)
+    :return: Polars Struct expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    c = parse_expr(close)
+    middle = c.rolling_mean(window_size=period)
+    upper = middle * (1.0 + percentage)
+    lower = middle * (1.0 - percentage)
+
+    return pl.struct([upper.alias("upper"), middle.alias("middle"), lower.alias("lower")])
+
+
+def keltner_width(
+    high: IntoExpr,
+    low: IntoExpr,
+    close: IntoExpr,
+    ema_period: int = 20,
+    atr_period: int = 10,
+    multiplier: float = 2.0,
+) -> pl.Expr:
+    """Normalized Keltner Channel Width (Squeeze metric).
+
+    Calculates the percentage spread of Keltner Channels relative to the EMA midline:
+    (Upper - Lower) / Middle * 100.
+
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param close: close price column or expression
+    :param ema_period: period for center EMA line (default 20)
+    :param atr_period: period for ATR volatility band (default 10)
+    :param multiplier: ATR multiplier (default 2.0)
+    :return: Polars expression
+    """
+    c = parse_expr(close)
+    middle = c.ewm_mean(span=ema_period, adjust=False)
+    atr_val = atr(high, low, close, period=atr_period)
+    spread = 2.0 * multiplier * atr_val
+    return pl.when(middle > 0.0).then(100.0 * spread / middle).otherwise(0.0)
+
+
+def bollinger_delta(
+    close: IntoExpr,
+    period: int = 20,
+    num_std: float = 2.0,
+) -> pl.Expr:
+    """Bollinger Band Delta (Band Spread).
+
+    Difference between Upper Band and Lower Band: 2 * num_std * stddev.
+
+    :param close: price column or expression
+    :param period: rolling lookback period (default 20)
+    :param num_std: standard deviation multiplier (default 2.0)
+    :return: Polars expression
+    """
+    if period <= 0:
+        raise ValueError("period must be a positive integer greater than zero")
+    c = parse_expr(close)
+    std = c.rolling_std(window_size=period)
+    return 2.0 * num_std * std
+
+
+def starc_bands(
+    high: IntoExpr,
+    low: IntoExpr,
+    close: IntoExpr,
+    period: int = 20,
+    atr_period: int = 15,
+    multiplier: float = 2.0,
+) -> pl.Expr:
+    """STARC Bands (Stoller Average Range Channels).
+
+    Volatility channel combining an SMA baseline with ATR-derived boundaries.
+    Returns Struct with: `upper`, `middle`, `lower`.
+
+    :param high: high price column or expression
+    :param low: low price column or expression
+    :param close: close price column or expression
+    :param period: SMA midline period (default 20)
+    :param atr_period: ATR lookback period (default 15)
+    :param multiplier: ATR band multiplier (default 2.0)
+    :return: Polars Struct expression
+    """
+    if period <= 0 or atr_period <= 0:
+        raise ValueError("periods must be positive integers greater than zero")
+    c = parse_expr(close)
+    middle = c.rolling_mean(window_size=period)
+    atr_val = atr(high, low, close, period=atr_period)
+    upper = middle + multiplier * atr_val
+    lower = middle - multiplier * atr_val
+
+    return pl.struct([upper.alias("upper"), middle.alias("middle"), lower.alias("lower")])

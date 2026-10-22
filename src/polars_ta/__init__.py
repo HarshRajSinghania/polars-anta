@@ -3,6 +3,20 @@
 from __future__ import annotations
 
 from . import namespace  # noqa: F401 - triggers Polars namespace registration
+from .alpha import (
+    co_ratio,
+    decay_linear,
+    entropy,
+    hl_ratio,
+    relative_spread,
+    returns_divergence,
+    ts_argmax,
+    ts_argmin,
+    ts_rank,
+    ts_zscore,
+    twap,
+    volume_weighted_momentum,
+)
 from .momentum import (
     awesome_oscillator,
     bop,
@@ -24,17 +38,36 @@ from .momentum import (
     ultimate_oscillator,
     williams_r,
 )
+from .stats import (
+    kurtosis,
+    linear_regression_angle,
+    linear_regression_forecast,
+    linear_regression_intercept,
+    linear_regression_slope,
+    percentile_rank,
+    rolling_alpha,
+    rolling_beta,
+    rolling_corr,
+    rolling_cov,
+    skewness,
+    zscore,
+)
 from .trend import (
     adx,
     alma,
     aroon,
+    camarilla_pivots,
+    center_of_gravity,
     chop,
     dema,
     ema,
+    fibonacci_pivots,
     hma,
+    ichimoku,
     kama,
     mass_index,
     mcginley_dynamic,
+    pivot_points,
     psar,
     sma,
     supertrend,
@@ -43,20 +76,25 @@ from .trend import (
     vidya,
     vortex,
     wma,
+    woodie_pivots,
     zlema,
 )
 from .volatility import (
     atr,
     bollinger_bands,
+    bollinger_delta,
     chaikin_volatility,
     chandelier_exit,
     donchian_channels,
     donchian_width,
+    envelopes,
     garman_klass_volatility,
     historical_volatility,
     keltner_channels,
+    keltner_width,
     natr,
     parkinson_volatility,
+    starc_bands,
     stddev,
     true_range,
     ulcer_index,
@@ -81,7 +119,7 @@ from .volume import (
 __version__ = "0.1.0"
 
 __all__ = [
-    # Trend (19)
+    # Trend (25)
     "sma",
     "ema",
     "wma",
@@ -101,6 +139,12 @@ __all__ = [
     "kama",
     "mcginley_dynamic",
     "vidya",
+    "center_of_gravity",
+    "ichimoku",
+    "pivot_points",
+    "fibonacci_pivots",
+    "camarilla_pivots",
+    "woodie_pivots",
     # Momentum (19)
     "rsi",
     "macd",
@@ -121,7 +165,7 @@ __all__ = [
     "dpo",
     "bop",
     "cfo",
-    # Volatility (14)
+    # Volatility (18)
     "true_range",
     "atr",
     "bollinger_bands",
@@ -136,6 +180,10 @@ __all__ = [
     "garman_klass_volatility",
     "chaikin_volatility",
     "donchian_width",
+    "envelopes",
+    "keltner_width",
+    "bollinger_delta",
+    "starc_bands",
     # Volume (14)
     "obv",
     "vwap",
@@ -151,4 +199,30 @@ __all__ = [
     "force_index",
     "vpci",
     "vr",
+    # Quantitative Statistics & Regression (12)
+    "zscore",
+    "percentile_rank",
+    "skewness",
+    "kurtosis",
+    "rolling_cov",
+    "rolling_corr",
+    "rolling_beta",
+    "rolling_alpha",
+    "linear_regression_slope",
+    "linear_regression_intercept",
+    "linear_regression_angle",
+    "linear_regression_forecast",
+    # Alpha Factor Primitives (12)
+    "ts_rank",
+    "ts_argmax",
+    "ts_argmin",
+    "decay_linear",
+    "ts_zscore",
+    "returns_divergence",
+    "hl_ratio",
+    "co_ratio",
+    "volume_weighted_momentum",
+    "relative_spread",
+    "twap",
+    "entropy",
 ]

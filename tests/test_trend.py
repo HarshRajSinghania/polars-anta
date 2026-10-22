@@ -9,13 +9,18 @@ from polars_ta.trend import (
     adx,
     alma,
     aroon,
+    camarilla_pivots,
+    center_of_gravity,
     chop,
     dema,
     ema,
+    fibonacci_pivots,
     hma,
+    ichimoku,
     kama,
     mass_index,
     mcginley_dynamic,
+    pivot_points,
     psar,
     sma,
     supertrend,
@@ -24,6 +29,7 @@ from polars_ta.trend import (
     vidya,
     vortex,
     wma,
+    woodie_pivots,
     zlema,
 )
 
@@ -240,3 +246,53 @@ def test_vidya(sample_ohlcv_df: pl.DataFrame):
     result = sample_ohlcv_df.select(vidya("close", period=5, cmo_period=5).alias("vidya"))
     vals = [x for x in result["vidya"].to_list() if x is not None]
     assert len(vals) > 0
+
+
+def test_center_of_gravity(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(center_of_gravity("close", period=5).alias("cg"))
+    vals = [x for x in result["cg"].to_list() if x is not None]
+    assert len(vals) > 0
+
+
+def test_ichimoku(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        ichimoku(
+            "high",
+            "low",
+            "close",
+            tenkan_period=3,
+            kijun_period=5,
+            senkou_b_period=8,
+            displacement=3,
+        ).alias("ichi")
+    ).unnest("ichi")
+    assert "tenkan_sen" in result.columns
+    assert "kijun_sen" in result.columns
+    assert "senkou_span_a" in result.columns
+    assert "senkou_span_b" in result.columns
+    assert "chikou_span" in result.columns
+
+
+def test_pivots(sample_ohlcv_df: pl.DataFrame):
+    res_std = sample_ohlcv_df.select(pivot_points("high", "low", "close").alias("p")).unnest("p")
+    assert "pivot" in res_std.columns
+    assert "r1" in res_std.columns
+    assert "s1" in res_std.columns
+
+    res_fib = sample_ohlcv_df.select(fibonacci_pivots("high", "low", "close").alias("p")).unnest(
+        "p"
+    )
+    assert "pivot" in res_fib.columns
+    assert "r3" in res_fib.columns
+
+    res_cam = sample_ohlcv_df.select(camarilla_pivots("high", "low", "close").alias("p")).unnest(
+        "p"
+    )
+    assert "r4" in res_cam.columns
+    assert "s4" in res_cam.columns
+
+    res_wd = sample_ohlcv_df.select(
+        woodie_pivots("open", "high", "low", "close").alias("p")
+    ).unnest("p")
+    assert "pivot" in res_wd.columns
+    assert "r2" in res_wd.columns

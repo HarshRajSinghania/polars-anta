@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import polars as pl
 
-from . import momentum, trend, volatility, volume
+from . import alpha, momentum, stats, trend, volatility, volume
 
 if TYPE_CHECKING:
     from .core import IntoExpr
@@ -153,6 +153,46 @@ class TechnicalAnalysisExpr:
     def vidya(self, period: int = 9, cmo_period: int = 9) -> pl.Expr:
         """Variable Index Dynamic Average (VIDYA)."""
         return trend.vidya(self._expr, period=period, cmo_period=cmo_period)
+
+    def center_of_gravity(self, period: int = 10) -> pl.Expr:
+        """Center of Gravity (CG) Oscillator."""
+        return trend.center_of_gravity(self._expr, period=period)
+
+    def ichimoku(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        tenkan_period: int = 9,
+        kijun_period: int = 26,
+        senkou_b_period: int = 52,
+        displacement: int = 26,
+    ) -> pl.Expr:
+        """Ichimoku Kinko Hyo Cloud."""
+        return trend.ichimoku(
+            high=high,
+            low=low,
+            close=self._expr,
+            tenkan_period=tenkan_period,
+            kijun_period=kijun_period,
+            senkou_b_period=senkou_b_period,
+            displacement=displacement,
+        )
+
+    def pivot_points(self, high: IntoExpr, low: IntoExpr) -> pl.Expr:
+        """Floor Trader Standard Pivot Points."""
+        return trend.pivot_points(high=high, low=low, close=self._expr)
+
+    def fibonacci_pivots(self, high: IntoExpr, low: IntoExpr) -> pl.Expr:
+        """Fibonacci Pivot Points."""
+        return trend.fibonacci_pivots(high=high, low=low, close=self._expr)
+
+    def camarilla_pivots(self, high: IntoExpr, low: IntoExpr) -> pl.Expr:
+        """Camarilla Pivot Points."""
+        return trend.camarilla_pivots(high=high, low=low, close=self._expr)
+
+    def woodie_pivots(self, open_: IntoExpr, high: IntoExpr, low: IntoExpr) -> pl.Expr:
+        """Woodie's Pivot Points."""
+        return trend.woodie_pivots(open_=open_, high=high, low=low, close=self._expr)
 
     # =========================================================================
     # Momentum Indicators (19)
@@ -533,6 +573,50 @@ class TechnicalAnalysisExpr:
         """Donchian Channel Width."""
         return volatility.donchian_width(high=high, low=low, period=period)
 
+    def envelopes(self, period: int = 20, percentage: float = 0.025) -> pl.Expr:
+        """Moving Average Envelopes."""
+        return volatility.envelopes(self._expr, period=period, percentage=percentage)
+
+    def keltner_width(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        ema_period: int = 20,
+        atr_period: int = 10,
+        multiplier: float = 2.0,
+    ) -> pl.Expr:
+        """Normalized Keltner Channel Width (Squeeze metric)."""
+        return volatility.keltner_width(
+            high=high,
+            low=low,
+            close=self._expr,
+            ema_period=ema_period,
+            atr_period=atr_period,
+            multiplier=multiplier,
+        )
+
+    def bollinger_delta(self, period: int = 20, num_std: float = 2.0) -> pl.Expr:
+        """Bollinger Band Delta (Band Spread)."""
+        return volatility.bollinger_delta(self._expr, period=period, num_std=num_std)
+
+    def starc_bands(
+        self,
+        high: IntoExpr,
+        low: IntoExpr,
+        period: int = 20,
+        atr_period: int = 15,
+        multiplier: float = 2.0,
+    ) -> pl.Expr:
+        """STARC Bands (Stoller Average Range Channels)."""
+        return volatility.starc_bands(
+            high=high,
+            low=low,
+            close=self._expr,
+            period=period,
+            atr_period=atr_period,
+            multiplier=multiplier,
+        )
+
     # =========================================================================
     # Volume Indicators (14)
     # =========================================================================
@@ -685,3 +769,112 @@ class TechnicalAnalysisExpr:
     def vr(self, volume_col: IntoExpr, period: int = 26) -> pl.Expr:
         """Volume Ratio (VR)."""
         return volume.vr(close=self._expr, volume=volume_col, period=period)
+
+    # =========================================================================
+    # Quantitative Statistics & Regression Transforms (12)
+    # =========================================================================
+
+    def zscore(self, period: int = 20) -> pl.Expr:
+        """Rolling Z-Score."""
+        return stats.zscore(self._expr, period=period)
+
+    def percentile_rank(self, period: int = 20) -> pl.Expr:
+        """Rolling Percentile Rank."""
+        return stats.percentile_rank(self._expr, period=period)
+
+    def skewness(self, period: int = 20) -> pl.Expr:
+        """Rolling Sample Skewness."""
+        return stats.skewness(self._expr, period=period)
+
+    def kurtosis(self, period: int = 20) -> pl.Expr:
+        """Rolling Excess Kurtosis."""
+        return stats.kurtosis(self._expr, period=period)
+
+    def rolling_cov(self, other: IntoExpr, period: int = 20) -> pl.Expr:
+        """Rolling Covariance with another series."""
+        return stats.rolling_cov(self._expr, other, period=period)
+
+    def rolling_corr(self, other: IntoExpr, period: int = 20) -> pl.Expr:
+        """Rolling Correlation with another series."""
+        return stats.rolling_corr(self._expr, other, period=period)
+
+    def rolling_beta(self, benchmark_returns: IntoExpr, period: int = 60) -> pl.Expr:
+        """Rolling CAPM Beta relative to a benchmark."""
+        return stats.rolling_beta(self._expr, benchmark_returns, period=period)
+
+    def rolling_alpha(
+        self,
+        benchmark_returns: IntoExpr,
+        rf: float = 0.0,
+        period: int = 60,
+    ) -> pl.Expr:
+        """Rolling Jensen's Alpha relative to a benchmark."""
+        return stats.rolling_alpha(self._expr, benchmark_returns, rf=rf, period=period)
+
+    def linear_regression_slope(self, period: int = 14) -> pl.Expr:
+        """Rolling OLS Linear Regression Slope."""
+        return stats.linear_regression_slope(self._expr, period=period)
+
+    def linear_regression_intercept(self, period: int = 14) -> pl.Expr:
+        """Rolling OLS Linear Regression Intercept."""
+        return stats.linear_regression_intercept(self._expr, period=period)
+
+    def linear_regression_angle(self, period: int = 14) -> pl.Expr:
+        """Rolling Linear Regression Angle (degrees)."""
+        return stats.linear_regression_angle(self._expr, period=period)
+
+    def linear_regression_forecast(self, period: int = 14) -> pl.Expr:
+        """Rolling Linear Regression Forecast value."""
+        return stats.linear_regression_forecast(self._expr, period=period)
+
+    # =========================================================================
+    # Alpha Factor Primitives & Signal Transforms (12)
+    # =========================================================================
+
+    def ts_rank(self, period: int = 10) -> pl.Expr:
+        """Time-series Rank."""
+        return alpha.ts_rank(self._expr, period=period)
+
+    def ts_argmax(self, period: int = 10) -> pl.Expr:
+        """Time-series ArgMax (bars ago of maximum)."""
+        return alpha.ts_argmax(self._expr, period=period)
+
+    def ts_argmin(self, period: int = 10) -> pl.Expr:
+        """Time-series ArgMin (bars ago of minimum)."""
+        return alpha.ts_argmin(self._expr, period=period)
+
+    def decay_linear(self, period: int = 10) -> pl.Expr:
+        """Linearly Decayed Weighted Moving Average."""
+        return alpha.decay_linear(self._expr, period=period)
+
+    def ts_zscore(self, period: int = 20) -> pl.Expr:
+        """Time-series Rolling Z-Score."""
+        return alpha.ts_zscore(self._expr, period=period)
+
+    def returns_divergence(self, volume: IntoExpr, period: int = 14) -> pl.Expr:
+        """Price-Volume Returns Divergence."""
+        return alpha.returns_divergence(self._expr, volume=volume, period=period)
+
+    def hl_ratio(self, low: IntoExpr) -> pl.Expr:
+        """Log High-to-Low Ratio."""
+        return alpha.hl_ratio(high=self._expr, low=low)
+
+    def co_ratio(self, open_: IntoExpr) -> pl.Expr:
+        """Log Close-to-Open Ratio."""
+        return alpha.co_ratio(close=self._expr, open_=open_)
+
+    def volume_weighted_momentum(self, volume: IntoExpr, period: int = 10) -> pl.Expr:
+        """Volume-Weighted Momentum."""
+        return alpha.volume_weighted_momentum(self._expr, volume=volume, period=period)
+
+    def relative_spread(self, low: IntoExpr, close: IntoExpr) -> pl.Expr:
+        """Normalized Relative Spread ((High - Low) / Close)."""
+        return alpha.relative_spread(high=self._expr, low=low, close=close)
+
+    def twap(self, low: IntoExpr, close: IntoExpr, period: int = 20) -> pl.Expr:
+        """Rolling Time-Weighted Average Price (TWAP)."""
+        return alpha.twap(high=self._expr, low=low, close=close, period=period)
+
+    def entropy(self, period: int = 20, bins: int = 5) -> pl.Expr:
+        """Rolling Shannon Entropy of returns."""
+        return alpha.entropy(self._expr, period=period, bins=bins)

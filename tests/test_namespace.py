@@ -32,6 +32,14 @@ def test_namespace_trend(sample_ohlcv_df: pl.DataFrame):
             pl.col("close").ta.kama(period=5).alias("kama"),
             pl.col("close").ta.mcginley_dynamic(period=5).alias("md"),
             pl.col("close").ta.vidya(period=5, cmo_period=5).alias("vidya"),
+            pl.col("close").ta.center_of_gravity(period=5).alias("cg"),
+            pl.col("close")
+            .ta.ichimoku(high="high", low="low", tenkan_period=3, kijun_period=5, senkou_b_period=8)
+            .alias("ichi"),
+            pl.col("close").ta.pivot_points(high="high", low="low").alias("pivots"),
+            pl.col("close").ta.fibonacci_pivots(high="high", low="low").alias("fib_pivots"),
+            pl.col("close").ta.camarilla_pivots(high="high", low="low").alias("cam_pivots"),
+            pl.col("close").ta.woodie_pivots(open_="open", high="high", low="low").alias("woodie"),
         ]
     )
 
@@ -41,6 +49,9 @@ def test_namespace_trend(sample_ohlcv_df: pl.DataFrame):
     assert "t3" in df_res.columns
     assert "st" in df_res.columns
     assert "kama" in df_res.columns
+    assert "cg" in df_res.columns
+    assert "ichi" in df_res.columns
+    assert "pivots" in df_res.columns
 
 
 def test_namespace_momentum(sample_ohlcv_df: pl.DataFrame):
@@ -99,6 +110,14 @@ def test_namespace_volatility(sample_ohlcv_df: pl.DataFrame):
             .ta.chaikin_volatility(high="high", low="low", period=5, roc_period=5)
             .alias("cv"),
             pl.col("close").ta.donchian_width(high="high", low="low", period=10).alias("dw"),
+            pl.col("close").ta.envelopes(period=10, percentage=0.02).alias("env"),
+            pl.col("close")
+            .ta.keltner_width(high="high", low="low", ema_period=10, atr_period=5)
+            .alias("kw"),
+            pl.col("close").ta.bollinger_delta(period=10).alias("b_delta"),
+            pl.col("close")
+            .ta.starc_bands(high="high", low="low", period=10, atr_period=5)
+            .alias("starc"),
         ]
     )
 
@@ -108,6 +127,10 @@ def test_namespace_volatility(sample_ohlcv_df: pl.DataFrame):
     assert "pv" in df_res.columns
     assert "gk" in df_res.columns
     assert "dw" in df_res.columns
+    assert "env" in df_res.columns
+    assert "kw" in df_res.columns
+    assert "b_delta" in df_res.columns
+    assert "starc" in df_res.columns
 
 
 def test_namespace_volume(sample_ohlcv_df: pl.DataFrame):
@@ -161,3 +184,54 @@ def test_namespace_multi_asset_over(multi_asset_ohlcv_df: pl.DataFrame):
     assert "sma_5" in res.columns
     assert "dema_5" in res.columns
     assert "roc_5" in res.columns
+
+
+def test_namespace_stats(sample_ohlcv_df: pl.DataFrame):
+    df_res = sample_ohlcv_df.select(
+        [
+            pl.col("close").ta.zscore(5).alias("zscore"),
+            pl.col("close").ta.percentile_rank(5).alias("pr"),
+            pl.col("close").ta.skewness(5).alias("skew"),
+            pl.col("close").ta.kurtosis(5).alias("kurt"),
+            pl.col("close").ta.rolling_cov("open", period=5).alias("cov"),
+            pl.col("close").ta.rolling_corr("open", period=5).alias("corr"),
+            pl.col("close").ta.rolling_beta("open", period=5).alias("beta"),
+            pl.col("close").ta.rolling_alpha("open", rf=0.0, period=5).alias("alpha"),
+            pl.col("close").ta.linear_regression_slope(5).alias("slope"),
+            pl.col("close").ta.linear_regression_intercept(5).alias("intercept"),
+            pl.col("close").ta.linear_regression_angle(5).alias("angle"),
+            pl.col("close").ta.linear_regression_forecast(5).alias("forecast"),
+        ]
+    )
+
+    assert "zscore" in df_res.columns
+    assert "pr" in df_res.columns
+    assert "skew" in df_res.columns
+    assert "slope" in df_res.columns
+    assert "forecast" in df_res.columns
+
+
+def test_namespace_alpha(sample_ohlcv_df: pl.DataFrame):
+    df_res = sample_ohlcv_df.select(
+        [
+            pl.col("close").ta.ts_rank(5).alias("ts_rank"),
+            pl.col("close").ta.ts_argmax(5).alias("ts_argmax"),
+            pl.col("close").ta.ts_argmin(5).alias("ts_argmin"),
+            pl.col("close").ta.decay_linear(5).alias("decay"),
+            pl.col("close").ta.ts_zscore(5).alias("ts_zscore"),
+            pl.col("close").ta.returns_divergence(volume="volume", period=5).alias("ret_div"),
+            pl.col("high").ta.hl_ratio(low="low").alias("hl_r"),
+            pl.col("close").ta.co_ratio(open_="open").alias("co_r"),
+            pl.col("close").ta.volume_weighted_momentum(volume="volume", period=5).alias("vwm"),
+            pl.col("high").ta.relative_spread(low="low", close="close").alias("rel_spread"),
+            pl.col("high").ta.twap(low="low", close="close", period=5).alias("twap"),
+            pl.col("close").ta.entropy(period=10, bins=3).alias("entropy"),
+        ]
+    )
+
+    assert "ts_rank" in df_res.columns
+    assert "ts_argmax" in df_res.columns
+    assert "decay" in df_res.columns
+    assert "hl_r" in df_res.columns
+    assert "twap" in df_res.columns
+    assert "entropy" in df_res.columns

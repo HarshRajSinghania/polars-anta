@@ -7,15 +7,19 @@ import polars as pl
 from polars_ta.volatility import (
     atr,
     bollinger_bands,
+    bollinger_delta,
     chaikin_volatility,
     chandelier_exit,
     donchian_channels,
     donchian_width,
+    envelopes,
     garman_klass_volatility,
     historical_volatility,
     keltner_channels,
+    keltner_width,
     natr,
     parkinson_volatility,
+    starc_bands,
     stddev,
     true_range,
     ulcer_index,
@@ -158,3 +162,43 @@ def test_donchian_width(sample_ohlcv_df: pl.DataFrame):
     assert len(vals) > 0
     for v in vals:
         assert v >= 0.0
+
+
+def test_envelopes(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        envelopes("close", period=10, percentage=0.025).alias("env")
+    ).unnest("env")
+    assert "upper" in result.columns
+    assert "middle" in result.columns
+    assert "lower" in result.columns
+    assert result["upper"][-1] > result["middle"][-1] > result["lower"][-1]
+
+
+def test_keltner_width(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        keltner_width("high", "low", "close", ema_period=10, atr_period=5, multiplier=2.0).alias(
+            "kw"
+        )
+    )
+    vals = [x for x in result["kw"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v > 0.0
+
+
+def test_bollinger_delta(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(bollinger_delta("close", period=10, num_std=2.0).alias("delta"))
+    vals = [x for x in result["delta"].to_list() if x is not None]
+    assert len(vals) > 0
+    for v in vals:
+        assert v >= 0.0
+
+
+def test_starc_bands(sample_ohlcv_df: pl.DataFrame):
+    result = sample_ohlcv_df.select(
+        starc_bands("high", "low", "close", period=10, atr_period=5, multiplier=2.0).alias("starc")
+    ).unnest("starc")
+    assert "upper" in result.columns
+    assert "middle" in result.columns
+    assert "lower" in result.columns
+    assert result["upper"][-1] > result["middle"][-1] > result["lower"][-1]

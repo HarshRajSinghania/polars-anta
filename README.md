@@ -101,9 +101,9 @@ universe.with_columns(
 
 ---
 
-## Supported Indicators (66 Indicators)
+## Supported Indicators (100 Indicators)
 
-### Trend (19 Indicators)
+### Trend & Overlays (25 Indicators)
 - **`sma(close, period=10)`**: Simple Moving Average
 - **`ema(close, period=10)`**: Exponential Moving Average
 - **`wma(close, period=10)`**: Linearly-Weighted Moving Average
@@ -123,6 +123,12 @@ universe.with_columns(
 - **`kama(close, period=10, fast_span=2, slow_span=30)`**: Kaufman's Adaptive Moving Average
 - **`mcginley_dynamic(close, period=14, k=0.6)`**: McGinley Dynamic Average
 - **`vidya(close, period=9, cmo_period=9)`**: Variable Index Dynamic Average (Chande's VIDYA)
+- **`center_of_gravity(close, period=10)`**: Ehlers Center of Gravity Oscillator
+- **`ichimoku(high, low, close, tenkan=9, kijun=26, senkou_b=52, displacement=26)`**: Ichimoku Kinko Hyo Cloud
+- **`pivot_points(high, low, close)`**: Floor Trader Standard Pivot Points (`pivot`, `r1-r3`, `s1-s3`)
+- **`fibonacci_pivots(high, low, close)`**: Fibonacci Pivot Points (38.2%, 61.8%, 100%)
+- **`camarilla_pivots(high, low, close)`**: Camarilla Intraday Pivot Points (`r1-r4`, `s1-s4`)
+- **`woodie_pivots(open, high, low, close)`**: Woodie's Heavy-Close Pivot Points
 
 ### Momentum (19 Indicators)
 - **`rsi(close, period=14)`**: Relative Strength Index (Wilder's smoothing)
@@ -145,7 +151,7 @@ universe.with_columns(
 - **`bop(open, high, low, close)`**: Balance of Market Power
 - **`cfo(close, period=14)`**: Chande Forecast Oscillator
 
-### Volatility (14 Indicators)
+### Volatility & Channels (18 Indicators)
 - **`true_range(high, low, close)`**: True Range
 - **`atr(high, low, close, period=14)`**: Average True Range
 - **`bollinger_bands(close, period=20, num_std=2.0)`**: Bollinger Bands (Upper, Middle, Lower, Bandwidth, %B)
@@ -160,6 +166,10 @@ universe.with_columns(
 - **`garman_klass_volatility(open, high, low, close, period=20, trading_days=252)`**: Garman-Klass Efficient Volatility
 - **`chaikin_volatility(high, low, period=10, roc_period=10)`**: Chaikin Volatility
 - **`donchian_width(high, low, period=20)`**: Donchian Channel Width (%)
+- **`envelopes(close, period=20, percentage=0.025)`**: Moving Average Envelopes (`upper`, `middle`, `lower`)
+- **`keltner_width(high, low, close, ema=20, atr=10, multiplier=2.0)`**: Normalized Keltner Channel Width (%)
+- **`bollinger_delta(close, period=20, num_std=2.0)`**: Bollinger Band Spread ($2 \cdot k \cdot \sigma$)
+- **`starc_bands(high, low, close, period=20, atr_period=15, multiplier=2.0)`**: STARC Bands (Stoller Average Range Channels)
 
 ### Volume (14 Indicators)
 - **`obv(close, volume)`**: On-Balance Volume
@@ -176,6 +186,34 @@ universe.with_columns(
 - **`force_index(close, volume, period=13)`**: Elder's Force Index
 - **`vpci(close, volume, short_period=5, long_period=20)`**: Volume Price Confirmation Indicator
 - **`vr(close, volume, period=26)`**: Volume Ratio (Bullish vs Bearish volume)
+
+### Quantitative Statistics & Regression (12 Indicators)
+- **`zscore(close, period=20)`**: Rolling Z-Score standardized anomaly score
+- **`percentile_rank(close, period=20)`**: Rolling Percentile Rank $[0.0, 1.0]$
+- **`skewness(close, period=20)`**: Rolling Sample Skewness (asymmetry metric)
+- **`kurtosis(close, period=20)`**: Rolling Excess Kurtosis (tail-risk metric)
+- **`rolling_cov(x, y, period=20)`**: Rolling Sample Covariance between two series
+- **`rolling_corr(x, y, period=20)`**: Rolling Pearson Correlation $[-1.0, 1.0]$
+- **`rolling_beta(asset_ret, bench_ret, period=60)`**: Rolling CAPM Market Beta ($\text{Cov} / \text{Var}$)
+- **`rolling_alpha(asset_ret, bench_ret, rf=0.0, period=60)`**: Rolling Jensen's Risk-Adjusted Alpha
+- **`linear_regression_slope(close, period=14)`**: Vectorized OLS Linear Regression Slope
+- **`linear_regression_intercept(close, period=14)`**: Vectorized OLS Linear Regression Intercept
+- **`linear_regression_angle(close, period=14)`**: Linear Regression Trend Angle in degrees
+- **`linear_regression_forecast(close, period=14)`**: Linear Regression Current/Next-Bar Value Forecast
+
+### Alpha Factor Primitives (12 Indicators)
+- **`ts_rank(close, period=10)`**: Time-Series Rank (WorldQuant Alpha 101 primitive)
+- **`ts_argmax(close, period=10)`**: Time-Series ArgMax (lookback bars ago of window peak)
+- **`ts_argmin(close, period=10)`**: Time-Series ArgMin (lookback bars ago of window trough)
+- **`decay_linear(close, period=10)`**: Linearly Weighted Decay moving transform
+- **`ts_zscore(close, period=20)`**: Time-Series Standardized Normalization
+- **`returns_divergence(close, volume, period=14)`**: Price vs Volume Momentum Divergence
+- **`hl_ratio(high, low)`**: Log Intraday Range Expansion $\ln(\text{High} / \text{Low})$
+- **`co_ratio(close, open)`**: Log Intraday Sentiment Drift $\ln(\text{Close} / \text{Open})$
+- **`volume_weighted_momentum(close, volume, period=10)`**: Momentum amplified by relative volume
+- **`relative_spread(high, low, close)`**: Normalized Bar Range $(\text{High} - \text{Low}) / \text{Close}$
+- **`twap(high, low, close, period=20)`**: Rolling Time-Weighted Average Price
+- **`entropy(close, period=20, bins=5)`**: Rolling Shannon Information Entropy (Regime detector)
 
 ---
 
