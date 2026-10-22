@@ -1,4 +1,4 @@
-# Contributing to `polars-ta`
+# Contributing to `polars-anta`
 
 We welcome contributions from quantitative researchers, Python developers, and the open-source community!
 
@@ -8,8 +8,8 @@ We welcome contributions from quantitative researchers, Python developers, and t
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/polars-ta/polars-ta.git
-   cd polars-ta
+   git clone https://github.com/polars-anta/polars-anta.git
+   cd polars-anta
    ```
 
 2. **Create a virtual environment**:
@@ -30,14 +30,15 @@ We welcome contributions from quantitative researchers, Python developers, and t
 When adding a new indicator:
 
 1. **Pure Expression First**: Implement using `pl.Expr` wherever possible. Avoid Python loops over rows.
-2. **Support String or Expr**: Use `parse_expr` from `polars_ta.core` so users can pass either column names (`"close"`) or existing expressions (`pl.col("close")`).
-3. **Multi-Asset Compatibility**: Ensure the indicator executes without errors inside `.over("ticker")`.
-4. **Structured Outputs**: If the indicator produces multiple values (like bands or oscillators with signals), return a typed `pl.Struct`.
-5. **Comprehensive Tests**: Add test cases to the appropriate file in `tests/`. Verify test coverage remains above 90%:
+2. **Support String or Expr**: Use `parse_expr` from `polars_anta.core` so users can pass either column names (`"close"`) or existing expressions (`pl.col("close")`).
+3. **Register on Dual Namespaces**: Indicators added to `TechnicalAnalysisExpr` in `polars_anta/namespace.py` are automatically available under both `.anta` and `.ta`.
+4. **Multi-Asset Compatibility**: Ensure the indicator executes without errors inside `.over("ticker")`.
+5. **Structured Outputs**: If the indicator produces multiple values (like bands or oscillators with signals), return a typed `pl.Struct`.
+6. **Comprehensive Tests**: Add test cases to the appropriate file in `tests/`. Verify test coverage remains above 90%:
    ```bash
    pytest -v
    ```
-6. **Code Quality**: Ensure linter and formatter pass without errors:
+7. **Code Quality**: Ensure linter and formatter pass without errors:
    ```bash
    ruff check .
    ruff format --check .

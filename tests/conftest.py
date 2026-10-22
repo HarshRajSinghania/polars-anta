@@ -1,4 +1,4 @@
-"""Pytest fixtures for polars-ta testing."""
+"""Pytest fixtures for polars-anta testing."""
 
 from __future__ import annotations
 

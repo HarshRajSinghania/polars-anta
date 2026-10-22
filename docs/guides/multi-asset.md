@@ -24,16 +24,16 @@ In Polars, any expression can be partitioned across groups using `.over("ticker"
 
 ```python
 import polars as pl
-import polars_ta
+import polars_anta
 
 # Fast & parallelized across all CPU cores in Rust
 universe_with_indicators = universe_df.with_columns(
     [
-        pl.col("close").ta.sma(20).over("ticker").alias("sma_20"),
-        pl.col("close").ta.rsi(14).over("ticker").alias("rsi_14"),
-        pl.col("close").ta.macd().over("ticker").alias("macd"),
-        pl.col("close").ta.obv("volume").over("ticker").alias("obv"),
-        pl.col("close").ta.zscore(20).over("ticker").alias("zscore_20"),
+        pl.col("close").anta.sma(20).over("ticker").alias("sma_20"),
+        pl.col("close").anta.rsi(14).over("ticker").alias("rsi_14"),
+        pl.col("close").anta.macd().over("ticker").alias("macd"),
+        pl.col("close").anta.obv("volume").over("ticker").alias("obv"),
+        pl.col("close").anta.zscore(20).over("ticker").alias("zscore_20"),
     ]
 )
 ```

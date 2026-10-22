@@ -7,7 +7,7 @@ from collections.abc import Sequence
 
 import polars as pl
 
-from polars_ta.core import IntoExpr, parse_expr
+from .core import IntoExpr, parse_expr
 
 
 def ts_rank(

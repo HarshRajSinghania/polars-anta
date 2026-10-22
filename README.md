@@ -1,8 +1,8 @@
 <div align="center">
 
-# polars-ta
+# polars-anta
 
-**High-performance, zero-C-dependency technical analysis and alpha factor library powered natively by Polars Expressions.**
+**ANTA (Alpha & Numerical Technical Analysis): Ultra-fast, zero-C-dependency technical analysis and factor library powered natively by Polars Expressions.**
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org)
@@ -10,25 +10,26 @@
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Zero C Dependencies](https://img.shields.io/badge/dependencies-pure%20polars-brightgreen)](#)
 
-[Documentation](https://polars-ta.github.io/polars-ta/) • [Features](#key-features) • [Benchmark](#performance-benchmark-1000000-rows) • [Installation](#installation) • [Quickstart](#quickstart) • [Tutorials](#3-interactive-jupyter-notebooks) • [Indicators](#supported-indicators-100-indicators) • [Development](#development--testing)
+[Documentation](https://polars-anta.github.io/polars-anta/) • [Features](#key-features) • [Benchmark](#performance-benchmark-1000000-rows) • [Installation](#installation) • [Quickstart](#quickstart) • [Tutorials](#3-interactive-jupyter-notebooks) • [Indicators](#supported-indicators-100-indicators) • [Development](#development--testing)
 
 </div>
 
 ---
 
-## Why `polars-ta`?
+## Why `polars-anta`?
 
 Quantitative researchers and financial engineers have historically faced a trade-off between installation complexity and computation speed:
 
-| Capability | TA-Lib | pandas-ta | `polars-ta` |
+| Capability | TA-Lib | pandas-ta | `polars-anta` |
 | :--- | :---: | :---: | :---: |
 | **Dependencies** | Requires external C library & MSVC / GCC | Pure Python / NumPy | **Zero C compilation** (pure Polars) |
 | **Execution Engine** | Single-threaded C loops | Single-threaded Pandas / GIL | **Multi-threaded Rust** query engine |
 | **Multi-Asset Scaling** | Manual sequential loops | Slow `.groupby().apply()` | **Native `.over("ticker")`** parallelization |
+| **Dual Expression Namespace** | Unsupported | Unsupported | **Both `.anta` & `.ta`** supported |
 | **Lazy Evaluation** | Unsupported | Unsupported | **Full `pl.LazyFrame`** streaming support |
 | **Memory Layout** | Array conversion overhead | High Pandas memory footprint | **Zero-copy Arrow memory format** |
 
-`polars-ta` eliminates this compromise by implementing financial indicators directly as **Polars Expressions (`pl.Expr`)**. Computations are pushed into Polars' multi-threaded Rust engine, eliminating Python GIL bottlenecks without requiring any C compilers.
+`polars-anta` eliminates this compromise by implementing financial indicators directly as **Polars Expressions (`pl.Expr`)**. Computations are pushed into Polars' multi-threaded Rust engine, eliminating Python GIL bottlenecks without requiring any C compilers.
 
 ---
 
@@ -36,13 +37,13 @@ Quantitative researchers and financial engineers have historically faced a trade
 
 <div align="center">
 
-<img src="benchmarks/benchmark_speed.png" alt="polars-ta Performance Benchmark" width="920"/>
+<img src="benchmarks/benchmark_speed.png" alt="polars-anta Performance Benchmark" width="920"/>
 
 </div>
 
 Benchmarks measured across **1,000,000 bars** (single-asset random walk) and a **500 tickers x 2,000 bars universe**. Computations executed on Polars' multi-threaded Rust query engine vs single-threaded Pandas:
 
-| Operation / Indicator | Dataset Scale | Pandas Execution | `polars-ta` Execution | Measured Speedup |
+| Operation / Indicator | Dataset Scale | Pandas Execution | `polars-anta` Execution | Measured Speedup |
 | :--- | :--- | :---: | :---: | :---: |
 | **Linear Regression Slope** | 1,000,000 bars | 2.3529 s | **0.0209 s** | **112.4x Faster** |
 | **Multi-Asset RSI** | 500 tickers x 2k bars | 0.4398 s | **0.0545 s** | **8.1x Faster** |
@@ -57,20 +58,21 @@ Benchmarks measured across **1,000,000 bars** (single-asset random walk) and a *
 
 ## Key Features
 
+- **Dual Expression Namespaces**: Call indicators via `pl.col("close").anta.<indicator>()` or the classic shorthand `pl.col("close").ta.<indicator>()`.
 - **Expression-First Design**: Compose indicators directly within `.select()`, `.with_columns()`, and lazy query plans.
 - **Parallel Multi-Asset Computation**: Compute indicators across thousands of tickers in parallel using Polars' native window context:
   ```python
-  pl.col("close").ta.rsi(14).over("symbol")
+  pl.col("close").anta.rsi(14).over("symbol")
   ```
 - **Structured Outputs**: Multi-component indicators (MACD, Bollinger Bands, Stochastic, Keltner Channels) return typed `pl.Struct` expressions that maintain clean schemas.
-- **Zero-C Compilation**: `pip install polars-ta` works out of the box across Linux, macOS, and Windows.
+- **Zero-C Compilation**: `pip install polars-anta` works out of the box across Linux, macOS, and Windows.
 
 ---
 
 ## Installation
 
 ```bash
-pip install polars-ta
+pip install polars-anta
 ```
 
 *Requirements: Python >= 3.10, Polars >= 1.0.0*
@@ -79,11 +81,11 @@ pip install polars-ta
 
 ## Quickstart
 
-### 1. Modern Chained Expression Syntax (`.ta`)
+### 1. Modern Chained Expression Syntax (`.anta` or `.ta`)
 
 ```python
 import polars as pl
-import polars_ta  # Registers the `.ta` expression namespace
+import polars_anta  # Registers both `.anta` and `.ta` expression namespaces
 
 df = pl.DataFrame(
     {
@@ -95,11 +97,11 @@ df = pl.DataFrame(
     }
 )
 
-# Compute indicators directly on expressions
+# Compute indicators directly on expressions (using .anta or .ta)
 result = df.with_columns(
-    pl.col("close").ta.sma(period=3).alias("sma_3"),
-    pl.col("close").ta.rsi(period=3).alias("rsi_3"),
-    pl.col("close").ta.bollinger_bands(period=3).alias("bb"),
+    pl.col("close").anta.sma(period=3).alias("sma_3"),
+    pl.col("close").anta.rsi(period=3).alias("rsi_3"),
+    pl.col("close").anta.bollinger_bands(period=3).alias("bb"),
 )
 
 # Unnest structured outputs as needed
@@ -108,16 +110,16 @@ print(result.unnest("bb"))
 
 ### 2. Market-Wide Multi-Asset Parallel Execution
 
-Running technical indicators across an entire investment universe is a common bottleneck. In `polars-ta`, Polars distributes evaluation across all CPU cores automatically:
+Running technical indicators across an entire investment universe is a common bottleneck. In `polars-anta`, Polars distributes evaluation across all CPU cores automatically:
 
 ```python
 # Compute indicators across thousands of symbols simultaneously in Rust
 universe.with_columns(
     [
-        pl.col("close").ta.sma(20).over("ticker").alias("sma_20"),
-        pl.col("close").ta.rsi(14).over("ticker").alias("rsi_14"),
-        pl.col("close").ta.macd().over("ticker").alias("macd"),
-        pl.col("close").ta.obv("volume").over("ticker").alias("obv"),
+        pl.col("close").anta.sma(20).over("ticker").alias("sma_20"),
+        pl.col("close").anta.rsi(14).over("ticker").alias("rsi_14"),
+        pl.col("close").anta.macd().over("ticker").alias("macd"),
+        pl.col("close").anta.obv("volume").over("ticker").alias("obv"),
     ]
 )
 ```
@@ -128,8 +130,8 @@ Run our interactive tutorials directly in your browser with zero setup:
 
 | Notebook | Description | Interactive Demo |
 | :--- | :--- | :---: |
-| **01 - Quickstart Tutorial** | Comprehensive walk-through of expression syntax, Struct unnesting, and plotting. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-ta/polars-ta/blob/master/examples/01_quickstart.ipynb) |
-| **02 - Multi-Asset Portfolio Scan** | Real-world 500-ticker breakout screening in 50 milliseconds using `.over("ticker")`. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-ta/polars-ta/blob/master/examples/02_multi_asset_portfolio_scan.ipynb) |
+| **01 - Quickstart Tutorial** | Comprehensive walk-through of expression syntax, Struct unnesting, and plotting. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-anta/polars-anta/blob/master/examples/01_quickstart.ipynb) |
+| **02 - Multi-Asset Portfolio Scan** | Real-world 500-ticker breakout screening in 50 milliseconds using `.over("ticker")`. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-anta/polars-anta/blob/master/examples/02_multi_asset_portfolio_scan.ipynb) |
 
 ---
 
@@ -251,7 +253,7 @@ Run our interactive tutorials directly in your browser with zero setup:
 
 ## Architecture & Performance
 
-`polars-ta` is designed around three architectural pillars:
+`polars-anta` is designed around three architectural pillars:
 
 1. **Arrow Memory Layout**: Avoids memory copying between indicator transformations.
 2. **SIMD-Accelerated Vectorization**: Executes through Polars' optimized analytical kernels.
@@ -263,8 +265,8 @@ Run our interactive tutorials directly in your browser with zero setup:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/polars-ta.git
-cd polars-ta
+git clone https://github.com/polars-anta/polars-anta.git
+cd polars-anta
 
 # Install in editable mode with development dependencies
 pip install -e .[dev]
@@ -276,6 +278,14 @@ pytest -v
 ruff check .
 ruff format --check .
 ```
+
+---
+
+## Author & Community
+
+- **Author**: An Phan (Phan Bùi Hữu Ân) - [phanbuihuuan261103@gmail.com](mailto:phanbuihuuan261103@gmail.com)
+- **GitHub**: [@polars-anta](https://github.com/polars-anta/polars-anta)
+- **Discussion & Feature Requests**: [GitHub Discussions](https://github.com/polars-anta/polars-anta/discussions)
 
 ---
 

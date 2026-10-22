@@ -1,6 +1,6 @@
-"""Mathematical parity and precision verification tests for polars-ta indicators.
+"""Mathematical parity and precision verification tests for polars-anta indicators.
 
-Verifies that polars-ta indicators match textbook mathematical definitions
+Verifies that polars-anta indicators match textbook mathematical definitions
 and golden reference implementations within machine epsilon / float precision (< 1e-6).
 """
 
@@ -9,9 +9,9 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from polars_ta.stats import linear_regression_slope, zscore
-from polars_ta.trend import dema, ema, sma, wma
-from polars_ta.volatility import bollinger_bands
+from polars_anta.stats import linear_regression_slope, zscore
+from polars_anta.trend import dema, ema, sma, wma
+from polars_anta.volatility import bollinger_bands
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from polars_ta.alpha import (
+from polars_anta.alpha import (
     co_ratio,
     decay_linear,
     entropy,

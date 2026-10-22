@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from polars_ta.volatility import (
+from polars_anta.volatility import (
     atr,
     bollinger_bands,
     bollinger_delta,

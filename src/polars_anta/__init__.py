@@ -1,4 +1,4 @@
-"""polars-ta: High-performance, zero-C technical analysis and factor library powered by Polars."""
+"""polars-anta: Alpha & Numerical Technical Analysis library powered natively by Polars."""
 
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
-# Contributing to polars-ta
+# Contributing to polars-anta
 
-Thank you for your interest in contributing to **polars-ta**! We are building the fastest, most ergonomic technical analysis and factor library for the Polars ecosystem.
+Thank you for your interest in contributing to **polars-anta**! We are building the fastest, most ergonomic technical analysis and factor library for the Polars ecosystem.
 
 ## How Can You Contribute?
 
@@ -15,8 +15,8 @@ Thank you for your interest in contributing to **polars-ta**! We are building th
 
 1. Fork and clone the repository:
    ```bash
-   git clone https://github.com/<your-username>/polars-ta.git
-   cd polars-ta
+   git clone https://github.com/<your-username>/polars-anta.git
+   cd polars-anta
    ```
 
 2. Create a virtual environment and install dev dependencies:

@@ -3,7 +3,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from polars_ta.stats import (
+from polars_anta.stats import (
     kurtosis,
     linear_regression_angle,
     linear_regression_forecast,

@@ -1,11 +1,11 @@
-"""Tests for Polars .ta namespace integration."""
+"""Tests for Polars .anta and .ta namespace integration."""
 
 from __future__ import annotations
 
 import polars as pl
 
-# Importing polars_ta registers the `.ta` namespace on pl.Expr
-import polars_ta  # noqa: F401
+# Importing polars_anta registers both `.anta` and `.ta` namespaces on pl.Expr
+import polars_anta  # noqa: F401
 
 
 def test_namespace_trend(sample_ohlcv_df: pl.DataFrame):
@@ -235,3 +235,33 @@ def test_namespace_alpha(sample_ohlcv_df: pl.DataFrame):
     assert "hl_r" in df_res.columns
     assert "twap" in df_res.columns
     assert "entropy" in df_res.columns
+
+
+def test_namespace_anta_prefix(sample_ohlcv_df: pl.DataFrame):
+    """Verify that .anta prefix works identically to .ta prefix."""
+    df_anta = sample_ohlcv_df.select(
+        [
+            pl.col("close").anta.sma(5).alias("sma_anta"),
+            pl.col("close").anta.rsi(14).alias("rsi_anta"),
+            pl.col("close").anta.bollinger_bands(20).alias("bb_anta"),
+            pl.col("close").anta.obv("volume").alias("obv_anta"),
+            pl.col("close").anta.zscore(5).alias("zscore_anta"),
+            pl.col("close").anta.ts_rank(5).alias("ts_rank_anta"),
+        ]
+    )
+    df_ta = sample_ohlcv_df.select(
+        [
+            pl.col("close").ta.sma(5).alias("sma_ta"),
+            pl.col("close").ta.rsi(14).alias("rsi_ta"),
+            pl.col("close").ta.bollinger_bands(20).alias("bb_ta"),
+            pl.col("close").ta.obv("volume").alias("obv_ta"),
+            pl.col("close").ta.zscore(5).alias("zscore_ta"),
+            pl.col("close").ta.ts_rank(5).alias("ts_rank_ta"),
+        ]
+    )
+
+    assert df_anta["sma_anta"].equals(df_ta["sma_ta"])
+    assert df_anta["rsi_anta"].equals(df_ta["rsi_ta"])
+    assert df_anta["obv_anta"].equals(df_ta["obv_ta"])
+    assert df_anta["zscore_anta"].equals(df_ta["zscore_ta"])
+    assert df_anta["ts_rank_anta"].equals(df_ta["ts_rank_ta"])

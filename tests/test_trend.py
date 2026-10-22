@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from polars_ta.trend import (
+from polars_anta.trend import (
     adx,
     alma,
     aroon,

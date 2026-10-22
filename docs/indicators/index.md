@@ -1,6 +1,6 @@
 # Indicator Catalog (100 Indicators)
 
-`polars-ta` provides 100 high-performance financial indicators categorized into six specialized domains:
+`polars-anta` provides 100 high-performance financial indicators categorized into six specialized domains:
 
 | Category | Count | Key Features | Documentation |
 | :--- | :---: | :--- | :--- |
@@ -16,17 +16,17 @@
 
 ## Unified Usage Syntax
 
-All indicators can be invoked either via the chained expression syntax `.ta.<name>()` or through functional imports:
+All indicators can be invoked either via the chained expression syntax `.anta.<name>()` (or classic `.ta.<name>()`) or through functional imports:
 
 ```python
 import polars as pl
-import polars_ta
+import polars_anta
 
-# Method 1: Chained syntax
-df.select(pl.col("close").ta.rsi(14))
+# Method 1: Chained syntax (.anta or .ta)
+df.select(pl.col("close").anta.rsi(14))
 
 # Method 2: Functional syntax
-from polars_ta import rsi
+from polars_anta import rsi
 
 df.select(rsi("close", 14))
 ```

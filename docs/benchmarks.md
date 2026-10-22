@@ -1,12 +1,12 @@
 # Benchmarks & Performance Analysis
 
-To evaluate real-world performance, `polars-ta` provides an automated benchmarking suite (`benchmarks/benchmark_speed.py`) comparing execution speeds against Pandas / NumPy baselines across 1,000,000 rows.
+To evaluate real-world performance, `polars-anta` provides an automated benchmarking suite (`benchmarks/benchmark_speed.py`) comparing execution speeds against Pandas / NumPy baselines across 1,000,000 rows.
 
 ---
 
 ## Benchmark Results
 
-| Operation / Indicator | Dataset Scale | Pandas (s) | `polars-ta` (s) | Measured Speedup |
+| Operation / Indicator | Dataset Scale | Pandas (s) | `polars-anta` (s) | Measured Speedup |
 | :--- | :--- | :---: | :---: | :---: |
 | **Linear Regression Slope** | 1,000,000 bars | 1.8018 s | **0.0154 s** | **116.8x Faster** |
 | **Multi-Asset RSI** | 500 tickers x 2k bars | 0.4560 s | **0.0610 s** | **7.5x Faster** |
@@ -17,12 +17,12 @@ To evaluate real-world performance, `polars-ta` provides an automated benchmarki
 
 ---
 
-## Why is `polars-ta` so much faster?
+## Why is `polars-anta` so much faster?
 
 ### 1. Vectorized Linear Regression Decomposition
 Traditional packages compute rolling linear regression by taking 1,000,000 windows and repeatedly solving $y = \beta_0 + \beta_1 t$ with NumPy dot products.
 
-`polars-ta` decomposes the OLS closed-form equation into Linearly Weighted Moving Average (WMA) and Simple Moving Average (SMA):
+`polars-anta` decomposes the OLS closed-form equation into Linearly Weighted Moving Average (WMA) and Simple Moving Average (SMA):
 
 $$\beta_1 = \frac{6}{N - 1} (\text{WMA} - \text{SMA})$$
 

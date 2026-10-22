@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from polars_ta.momentum import (
+from polars_anta.momentum import (
     awesome_oscillator,
     bop,
     cci,

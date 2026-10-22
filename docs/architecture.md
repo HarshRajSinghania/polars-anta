@@ -1,6 +1,6 @@
 # Architecture & Design Principles
 
-`polars-ta` is engineered around three fundamental architectural pillars:
+`polars-anta` is engineered around three fundamental architectural pillars:
 
 ---
 
@@ -10,9 +10,10 @@ Existing technical analysis packages force quant researchers into an unpleasant 
 - **TA-Lib**: Written in C. Fast, but notoriously difficult to compile on Windows/macOS, crashes frequently on ABI mismatches, and lacks native DataFrame integration.
 - **pandas-ta**: Pure Python. Easy to install, but suffers from Python's Global Interpreter Lock (GIL), resulting in slow single-threaded loops on large datasets.
 
-`polars-ta` circumvents this entirely:
-- **Zero C Compilation**: Pure Polars expressions ensure installation always works out of the box (`pip install polars-ta`).
+`polars-anta` circumvents this entirely:
+- **Zero C Compilation**: Pure Polars expressions ensure installation always works out of the box (`pip install polars-anta`).
 - **Native Rust Execution**: Polars pushes expression execution into its multi-threaded Rust analytical engine, bypassing Python's GIL.
+- **Dual Namespace Ergonomics**: Supports both `.anta` and `.ta` on any Polars expression without performance cost.
 
 ---
 
@@ -20,7 +21,7 @@ Existing technical analysis packages force quant researchers into an unpleasant 
 
 Traditional Python pipelines waste significant CPU cycles converting data back and forth between NumPy arrays, Python lists, and C buffers.
 
-In `polars-ta`:
+In `polars-anta`:
 - Data remains in contiguous Arrow memory blocks.
 - Intermediate indicator steps share memory through Arrow buffers without memory replication.
 - Streaming operations process chunked batches without out-of-memory (OOM) crashes on gigabyte-scale datasets.
@@ -40,7 +41,7 @@ df.groupby("ticker").apply(lambda g: g["close"].rolling(20).mean())
 In Polars:
 ```python
 # Blazingly fast: Polars parallelizes groups across all CPU threads in Rust
-df.with_columns(pl.col("close").ta.sma(20).over("ticker"))
+df.with_columns(pl.col("close").anta.sma(20).over("ticker"))
 ```
 
 By leveraging Polars' window context `.over("ticker")`, calculations for all tickers run concurrently across CPU cores with zero extra code.

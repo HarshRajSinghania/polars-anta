@@ -1,4 +1,4 @@
-"""Quickstart example demonstrating polars-ta usage and multi-asset grouping."""
+"""Quickstart example demonstrating polars-anta usage and multi-asset grouping."""
 
 from __future__ import annotations
 
@@ -6,14 +6,15 @@ import sys
 
 import polars as pl
 
-import polars_ta  # noqa: F401
+# Importing polars_anta registers both `.anta` and `.ta` namespaces on expressions
+import polars_anta  # noqa: F401
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 
 def main():
-    print("--- 1. Single Asset Example ---")
+    print("--- 1. Single Asset Example (using .anta namespace) ---")
     df = pl.DataFrame(
         {
             "open": [100.0, 101.5, 102.0, 101.0, 103.5, 105.0, 104.2, 106.0],
@@ -24,13 +25,13 @@ def main():
         }
     )
 
-    # Compute SMA, RSI, Bollinger Bands, and OBV
+    # Compute SMA, RSI, Bollinger Bands, and OBV using .anta (or .ta)
     computed = df.with_columns(
         [
-            pl.col("close").ta.sma(3).alias("sma_3"),
-            pl.col("close").ta.rsi(3).alias("rsi_3"),
-            pl.col("close").ta.bollinger_bands(period=3).alias("bb"),
-            pl.col("close").ta.obv("volume").alias("obv"),
+            pl.col("close").anta.sma(3).alias("sma_3"),
+            pl.col("close").anta.rsi(3).alias("rsi_3"),
+            pl.col("close").anta.bollinger_bands(period=3).alias("bb"),
+            pl.col("close").anta.obv("volume").alias("obv"),
         ]
     )
 
@@ -49,8 +50,8 @@ def main():
     )
 
     result_multi = multi_asset.with_columns(
-        pl.col("close").ta.sma(2).over("ticker").alias("sma_2"),
-        pl.col("close").ta.rsi(2).over("ticker").alias("rsi_2"),
+        pl.col("close").anta.sma(2).over("ticker").alias("sma_2"),
+        pl.col("close").anta.rsi(2).over("ticker").alias("rsi_2"),
     )
     print(result_multi)
 

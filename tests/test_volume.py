@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from polars_ta.volume import (
+from polars_anta.volume import (
     adl,
     cmf,
     eom,

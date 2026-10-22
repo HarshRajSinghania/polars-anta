@@ -1,4 +1,4 @@
-"""High-throughput performance benchmark: polars-ta vs Pandas / NumPy.
+"""High-throughput performance benchmark: polars-anta vs Pandas / NumPy.
 
 Measures computation time across single-asset 1,000,000 bars and
 multi-asset 500 tickers x 2,000 bars (1,000,000 total rows).
@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
-import polars_ta  # noqa: F401
+import polars_anta  # noqa: F401
 
 
 def generate_single_asset_data(n_rows: int = 1_000_000) -> tuple[pl.DataFrame, pd.DataFrame]:
@@ -94,9 +94,9 @@ def benchmark_single_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str
 
     # Polars
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.sma(20))
+    _ = df_pl.select(pl.col("close").anta.sma(20))
     t_pl = time.perf_counter() - t0
-    results["SMA (20)"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["SMA (20)"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     # 2. EMA (20)
     print("Benchmarking EMA(20)...")
@@ -105,9 +105,9 @@ def benchmark_single_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str
     t_pd = time.perf_counter() - t0
 
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.ema(20))
+    _ = df_pl.select(pl.col("close").anta.ema(20))
     t_pl = time.perf_counter() - t0
-    results["EMA (20)"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["EMA (20)"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     # 3. Bollinger Bands (20, 2)
     print("Benchmarking Bollinger Bands(20, 2)...")
@@ -119,9 +119,9 @@ def benchmark_single_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str
     t_pd = time.perf_counter() - t0
 
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.bollinger_bands(20, 2.0))
+    _ = df_pl.select(pl.col("close").anta.bollinger_bands(20, 2.0))
     t_pl = time.perf_counter() - t0
-    results["Bollinger (20,2)"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["Bollinger (20,2)"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     # 4. Z-Score (20)
     print("Benchmarking Z-Score(20)...")
@@ -132,9 +132,9 @@ def benchmark_single_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str
     t_pd = time.perf_counter() - t0
 
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.zscore(20))
+    _ = df_pl.select(pl.col("close").anta.zscore(20))
     t_pl = time.perf_counter() - t0
-    results["Z-Score (20)"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["Z-Score (20)"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     # 5. Linear Regression Slope (14)
     print("Benchmarking Linear Regression Slope(14)...")
@@ -148,9 +148,9 @@ def benchmark_single_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str
     t_pd = time.perf_counter() - t0
 
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.linear_regression_slope(14))
+    _ = df_pl.select(pl.col("close").anta.linear_regression_slope(14))
     t_pl = time.perf_counter() - t0
-    results["Linear Reg (14)"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["Linear Reg (14)"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     return results
 
@@ -165,9 +165,9 @@ def benchmark_multi_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str,
     t_pd = time.perf_counter() - t0
 
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.sma(20).over("ticker"))
+    _ = df_pl.select(pl.col("close").anta.sma(20).over("ticker"))
     t_pl = time.perf_counter() - t0
-    results["Multi-Asset SMA"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["Multi-Asset SMA"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     print("Benchmarking Multi-Asset (500 tickers): RSI(14)...")
 
@@ -186,9 +186,9 @@ def benchmark_multi_asset(df_pl: pl.DataFrame, df_pd: pd.DataFrame) -> dict[str,
     t_pd = time.perf_counter() - t0
 
     t0 = time.perf_counter()
-    _ = df_pl.select(pl.col("close").ta.rsi(14).over("ticker"))
+    _ = df_pl.select(pl.col("close").anta.rsi(14).over("ticker"))
     t_pl = time.perf_counter() - t0
-    results["Multi-Asset RSI"] = {"pandas": t_pd, "polars_ta": t_pl}
+    results["Multi-Asset RSI"] = {"pandas": t_pd, "polars_anta": t_pl}
 
     return results
 
@@ -197,7 +197,7 @@ def plot_benchmark_chart(all_results: dict[str, dict[str, float]], output_path: 
     """Renders a modern, publication-grade benchmark chart."""
     labels = list(all_results.keys())
     pd_times = [all_results[k]["pandas"] for k in labels]
-    pl_times = [all_results[k]["polars_ta"] for k in labels]
+    pl_times = [all_results[k]["polars_anta"] for k in labels]
     speedups = [pd_t / pl_t for pd_t, pl_t in zip(pd_times, pl_times, strict=False)]
 
     # Modern plot styling
@@ -221,7 +221,7 @@ def plot_benchmark_chart(all_results: dict[str, dict[str, float]], output_path: 
         y_pos - bar_height / 2,
         pl_times,
         height=bar_height,
-        label="polars-ta (Multi-threaded Rust)",
+        label="polars-anta (Multi-threaded Rust)",
         color="#0275d8",
         alpha=0.95,
     )
@@ -236,7 +236,7 @@ def plot_benchmark_chart(all_results: dict[str, dict[str, float]], output_path: 
     )
     ax.set_xscale("log")
     ax.set_title(
-        "polars-ta Performance Benchmark: 1,000,000 Rows / 500 Tickers Universe",
+        "polars-anta Performance Benchmark: 1,000,000 Rows / 500 Tickers Universe",
         fontsize=14,
         fontweight="bold",
         pad=15,
@@ -269,7 +269,7 @@ def plot_benchmark_chart(all_results: dict[str, dict[str, float]], output_path: 
 
 def main():
     print("=" * 70)
-    print("polars-ta High-Performance Benchmarking Suite")
+    print("polars-anta High-Performance Benchmarking Suite")
     print("=" * 70)
 
     # 1. Single Asset Benchmark
@@ -285,12 +285,12 @@ def main():
     # Print summary table
     print("\n" + "=" * 70)
     print(
-        f"{'Indicator / Operation':<25} | {'Pandas (s)':<12} | {'polars-ta (s)':<14} | {'Speedup':<10}"
+        f"{'Indicator / Operation':<25} | {'Pandas (s)':<12} | {'polars-anta (s)':<14} | {'Speedup':<10}"
     )
     print("-" * 70)
     for k, v in all_results.items():
         pd_t = v["pandas"]
-        pl_t = v["polars_ta"]
+        pl_t = v["polars_anta"]
         ratio = pd_t / pl_t
         print(f"{k:<25} | {pd_t:<12.4f} | {pl_t:<14.4f} | {ratio:<10.1f}x")
     print("=" * 70)

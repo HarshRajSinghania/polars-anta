@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-We provide security updates for the following versions of `polars-ta`:
+We provide security updates for the following versions of `polars-anta`:
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -10,11 +10,11 @@ We provide security updates for the following versions of `polars-ta`:
 
 ## Reporting a Vulnerability
 
-We take the security of `polars-ta` seriously. If you believe you have found a security vulnerability in this project, please report it responsibly.
+We take the security of `polars-anta` seriously. If you believe you have found a security vulnerability in this project, please report it responsibly.
 
 ### How to report
 
-Please **do not** open a public GitHub issue for security vulnerabilities. Instead, please report potential vulnerabilities by opening a private security advisory on GitHub or sending an email to the repository maintainers.
+Please **do not** open a public GitHub issue for security vulnerabilities. Instead, please report potential vulnerabilities by opening a private security advisory on GitHub or sending an email to `phanbuihuuan261103@gmail.com`.
 
 Please include:
 - A description of the issue and potential impact.

@@ -12,11 +12,12 @@ if TYPE_CHECKING:
     from .core import IntoExpr
 
 
+@pl.api.register_expr_namespace("anta")
 @pl.api.register_expr_namespace("ta")
 class TechnicalAnalysisExpr:
-    """Namespace for technical analysis operations on Polars expressions.
+    """Namespace for technical analysis and alpha factor operations on Polars expressions.
 
-    Allows chaining technical analysis indicators directly on `pl.col(...)`.
+    Allows chaining indicators directly on `pl.col(...)` via `.anta.<indicator>()` or `.ta.<indicator>()`.
     """
 
     def __init__(self, expr: pl.Expr) -> None:

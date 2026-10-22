@@ -4,7 +4,7 @@ labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: Thanks for taking the time to report an issue in `polars-ta`!
+      value: Thanks for taking the time to report an issue in `polars-anta`!
   - type: textarea
     id: description
     attributes:
@@ -20,7 +20,7 @@ body:
       render: python
       placeholder: |
         import polars as pl
-        import polars_ta
+        import polars_anta
 
         df = pl.DataFrame(...)
         # Code demonstrating the bug

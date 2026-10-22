@@ -1,4 +1,4 @@
-"""Core utility functions and expression helpers for polars-ta."""
+"""Core utility functions and expression helpers for polars-anta."""
 
 from __future__ import annotations
 
