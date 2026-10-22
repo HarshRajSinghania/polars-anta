@@ -2,16 +2,16 @@
 
 Thank you for your interest in contributing to **polars-ta**! We are building the fastest, most ergonomic technical analysis and factor library for the Polars ecosystem.
 
-## 🌟 How Can You Contribute?
+## How Can You Contribute?
 
-1. **Implement New Indicators**: Add indicators from TA-Lib, WorldQuant 101 Alphas, or academic literature.
+1. **Implement New Indicators**: Add indicators from financial quantitative literature.
 2. **Performance Optimizations**: Benchmark and refine Polars expressions for maximum SIMD efficiency.
 3. **Bug Reports & Feature Requests**: Open detailed issues with minimal reproducible examples.
 4. **Documentation & Examples**: Improve tutorials, use cases, and notebooks.
 
 ---
 
-## 🛠️ Development Setup
+## Development Setup
 
 1. Fork and clone the repository:
    ```bash
@@ -23,7 +23,7 @@ Thank you for your interest in contributing to **polars-ta**! We are building th
    ```bash
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install -e .[dev]
+   pip install -e ".[dev,benchmark,docs]"
    ```
 
 3. Run the test suite:
@@ -39,10 +39,10 @@ Thank you for your interest in contributing to **polars-ta**! We are building th
 
 ---
 
-## 📐 Design Principles for New Indicators
+## Design Principles for New Indicators
 
 When implementing indicators:
-- **Zero Python loops**: All computations must be expressed as pure `pl.Expr` expressions.
-- **Support Grouping (`.over()`)**: Avoid stateful multi-step dependencies that break Polars window evaluation.
-- **Standard Formulas**: Match standard financial literature (Wilder, Kaufman, Bollinger, Murphy).
-- **Comprehensive Unit Tests**: Add tests in `tests/` checking correctness, edge cases (periods <= 0, flat prices), and namespace integration.
+- **Zero Python loops**: All computations must be expressed as pure `pl.Expr` expressions whenever possible.
+- **Support Grouping (`.over()`)**: Ensure expressions work cleanly within Polars window contexts across symbols.
+- **Standard Formulas**: Match standard financial literature (Wilder, Kaufman, Bollinger, Murphy, WorldQuant).
+- **Comprehensive Unit Tests**: Add tests in `tests/` checking correctness, edge cases, and namespace integration.

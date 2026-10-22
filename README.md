@@ -10,7 +10,7 @@
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Zero C Dependencies](https://img.shields.io/badge/dependencies-pure%20polars-brightgreen)](#)
 
-[Features](#key-features) • [Comparison](#why-polars-ta) • [Installation](#installation) • [Quickstart](#quickstart) • [Indicators](#supported-indicators) • [Development](#development--testing)
+[Documentation](https://polars-ta.github.io/polars-ta/) • [Features](#key-features) • [Benchmark](#performance-benchmark-1000000-rows) • [Installation](#installation) • [Quickstart](#quickstart) • [Tutorials](#3-interactive-jupyter-notebooks) • [Indicators](#supported-indicators-100-indicators) • [Development](#development--testing)
 
 </div>
 
@@ -121,6 +121,15 @@ universe.with_columns(
     ]
 )
 ```
+
+### 3. Interactive Jupyter Notebooks
+
+Run our interactive tutorials directly in your browser with zero setup:
+
+| Notebook | Description | Interactive Demo |
+| :--- | :--- | :---: |
+| **01 - Quickstart Tutorial** | Comprehensive walk-through of expression syntax, Struct unnesting, and plotting. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-ta/polars-ta/blob/master/examples/01_quickstart.ipynb) |
+| **02 - Multi-Asset Portfolio Scan** | Real-world 500-ticker breakout screening in 50 milliseconds using `.over("ticker")`. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/polars-ta/polars-ta/blob/master/examples/02_multi_asset_portfolio_scan.ipynb) |
 
 ---
 

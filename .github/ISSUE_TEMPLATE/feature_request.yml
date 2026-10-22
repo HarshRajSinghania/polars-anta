@@ -1,4 +1,4 @@
-name: 🚀 Feature Request
+name: Feature Request
 description: Suggest an idea or new indicator for polars-ta
 labels: ["enhancement"]
 body:
