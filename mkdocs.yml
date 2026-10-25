@@ -7,6 +7,8 @@ repo_name: huuan26/polars-anta
 
 theme:
   name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
   language: en
   palette:
     - media: "(prefers-color-scheme: light)"

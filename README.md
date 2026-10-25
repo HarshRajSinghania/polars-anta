@@ -1,6 +1,9 @@
 <div align="center">
 
-# polars-anta
+<img src="assets/banner.png" alt="polars-anta banner" width="100%" />
+
+<br/>
+<br/>
 
 **ANTA (Alpha & Numerical Technical Analysis): Ultra-fast, zero-C-dependency technical analysis and factor library powered natively by Polars Expressions.**
 
